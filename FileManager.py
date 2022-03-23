@@ -39,6 +39,11 @@ class FileManager():
             'courseUnsaved':QIcon("icons/courseUnsaved.png")
             }
 
+        if not os.path.exists('data'):
+            os.makedirs('data')
+        if not os.path.exists('repository'):
+            os.makedirs('repository')
+
         return cls.__instance
 
     def saveSubjects(self):
