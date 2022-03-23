@@ -170,10 +170,11 @@ class FileManager():
             return False
         if sys.platform.startswith('win'):
             path = '\\'.join(pathRaw[0])
+            subprocess.Popen(path, shell = True)
         else:
             path = '/'.join(pathRaw[0])
+            subprocess.call(["xdg-open", path])
 
-        subprocess.Popen(path, shell = True)
         return True
 
     def deleteFile(self, text, wPath):
