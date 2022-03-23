@@ -168,7 +168,11 @@ class FileManager():
             return False
         if len(pathRaw) == 0:
             return False
-        path = '\\'.join(pathRaw[0])
+        if sys.platform.startswith('win'):
+            path = '\\'.join(pathRaw[0])
+        else:
+            path = '/'.join(pathRaw[0])
+
         subprocess.Popen(path, shell = True)
         return True
 
