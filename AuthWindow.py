@@ -92,6 +92,8 @@ class AuthWindow(QMainWindow):
         FileManager().loadSettings()
         FileManager().loadDownloads()
         if self.ui.rememberMe.isChecked():
+            login = self.ui.loginEdit.text()
+            password = self.ui.passwordEdit.text()
             FileManager().saveUser(login, password)
         self.mainWindow.loadWidgets()
         self.mainWindow.show()
