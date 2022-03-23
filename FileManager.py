@@ -163,12 +163,8 @@ class FileManager():
             return False
         if len(pathRaw) == 0:
             return False
-        path = '/'.join(pathRaw[0])
-        if sys.platform.startswith('win'):
-            os.system("start " + path)
-        else:
-            os.system("./ " + path)
-
+        path = '\\'.join(pathRaw[0])
+        subprocess.Popen(path, shell = True)
         return True
 
     def deleteFile(self, text, wPath):

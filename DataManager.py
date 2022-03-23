@@ -260,7 +260,7 @@ class DataManager():
         if file is None or len(rawPath) == 0:
             print('DM().getFilePath() cant get path.')
             return ([], None)
-        chars = [i for i in(' ./<>:"\|?*#%&{}$!@=+`' + "'")]
+        chars = [i for i in(' -./<>:"\|?*#%&{}$!@=+`,()' + "'")]
         path = []
         for i in rawPath:
             temp = ''
