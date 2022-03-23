@@ -1,0 +1,16 @@
+
+__pycache__/
+
+repository/
+
+dist/
+
+data/
+
+build/
+
+тест.txt
+
+Test.qml
+
+TestForm.ui.qml
