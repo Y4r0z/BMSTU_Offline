@@ -173,7 +173,16 @@ class FileManager():
             subprocess.Popen(path, shell = True)
         else:
             path = '/'.join(pathRaw[0])
-            subprocess.call(["xdg-open", path])
+            myEnv = dict(os.environ)
+            lp_key = 'LD_LIBRARY_PATH'
+            lp_orig = myEnv.get(lp_key + '_ORIG')
+            if lp_orig is not None:
+                myEnv[lp_key] = lp_orig
+            else:
+                lp = myEnv.get(lp_key)
+                if lp is not None:
+                    myEnv.pop(lp_key)
+            subprocess.Popen(["xdg-open", "file.pdf"], env=myEnv)
 
         return True
 
