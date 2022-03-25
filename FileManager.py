@@ -182,7 +182,7 @@ class FileManager():
                 lp = myEnv.get(lp_key)
                 if lp is not None:
                     myEnv.pop(lp_key)
-            subprocess.Popen(["xdg-open", "file.pdf"], env=myEnv)
+            subprocess.Popen(["xdg-open", path], env=myEnv)
 
         return True
 
