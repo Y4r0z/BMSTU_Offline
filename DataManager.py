@@ -216,6 +216,8 @@ class DataManager():
         self.settings = sets
 
     def getFileParent(self, file, path):
+        if len(path) < 2:
+            return None
         subs = self.getSubjects()
         for i in subs:
             if i['text'] != path[0]:

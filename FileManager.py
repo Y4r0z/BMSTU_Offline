@@ -146,15 +146,14 @@ class FileManager():
             with open(fullPath, 'wb') as f:
                 f.write(DataManager().getDownloadData(file['href']))
             DataManager().addDownload(file['href'])
-            if not file['type'] is None and file['type'] in ['assign', 'folder']:
-                print(1)
-                fileParent = DataManager().getFileParent(file, wPath)
-                cnt = len(fileParent['files'])
+            parent = DataManager().getFileParent(file, wPath)
+            if not parent is None:
+                cnt = len(parent['files'])
                 n = 0
-                for f in fileParent['files']:
+                for f in parent['files']:
                     if DataManager().isDownloaded(f['href']):
                         n+=1
-                DataManager().addDownload(fileParent['href'], n/cnt*100)
+                DataManager().addDownload(parent['href'], n/cnt*100)
             self.saveDownloads()
             return True
         except Exception as e:
@@ -196,18 +195,18 @@ class FileManager():
         path = '/'.join(pathRaw[0])
         DataManager().removeDownload(file['href'])
         self.saveDownloads()
-        #
-        if not file['type'] is None and file['type'] in ['assign', 'folder']:
-            fileParent = DataManager().getFileParent(file, wPath)
-            DataManager().removeDownload(fileParent['href'])
+        parent = DataManager().getFileParent(file, wPath)
+        if not parent is None:
+            cnt = len(parent['files'])
+            n = 0
+            for f in parent['files']:
+                if DataManager().isDownloaded(f['href']):
+                    n+=1
+            if n != 0:
+                DataManager().addDownload(parent['href'], n/cnt*100)
+            else:
+                DataManager().removeDownload(parent['href'])
             self.saveDownloads()
-        #
         os.remove(path)
         return True
-
-    def downloadResourse(self, name, wPath):
-        pass
-
-    def openResourse(self, name, wPath):
-        pass
 
