@@ -338,7 +338,6 @@ class DataManager():
                 for k in j['files']:
                     if k['text'] == text:
                         return k
-                    if ki['text'] != path[2]: continue
 
 
 

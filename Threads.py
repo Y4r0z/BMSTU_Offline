@@ -122,7 +122,7 @@ class downloadFileThread(QThread):
         super().__init__()
         self.name = name
         self.path = path
-        self.isRunnig = True
+        self.isRunning = True
 
     def run(self):
         while True:

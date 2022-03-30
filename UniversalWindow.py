@@ -145,6 +145,9 @@ class UniversalWindow(QWidget):
                     self.openClicked(item)
                 elif text == 'Удалить':
                     self.deleteFileClicked(item)
+                elif text == 'Скачать всё':
+                    if self.mode == 1:
+                        self.downloadAssign(item)
             return True
         return super().eventFilter(source, event)
 
@@ -224,9 +227,33 @@ class UniversalWindow(QWidget):
             self.downloadFile(file['text'])
         return True
 
+    def downloadAssign(self, item):
+        text = item.text()
+        assign = DataManager().findByName(text, self.currentPath)
+        if DataManager().getDownload(assign['href'])['progress'] == 100:
+            print("downloadAssign() is already downloaded")
+            return
+        if assign is None:
+            print("downloadAssign() can't find an assign")
+            return
+        if assign['files'] is None:
+            print("downloadAssign() can't store any files")
+            return
+        if len(assign['files']) == 0:
+            assign['files'] = DataManager().getFiles(assign)
+            if assign['files'] is None or len(assign['files']) == 0:
+                print("downloadAssign() don't have any files")
+                return
+        downloadList = []
+        for i in assign['files']:
+            if not DataManager().isDownloaded(i['href']):
+                downloadList.append(i)
+        newPath = [i for i in self.currentPath]
+        newPath.append(text)
+        self.downloadFilesList(downloadList, newPath)
+
     def settingsButtonClicked(self):
         self.settingsWindow.show();
-
 
     def generateSubjects(self, filter = None):
         size = self.ui.list.count()
@@ -388,6 +415,7 @@ class UniversalWindow(QWidget):
     def downloadFile(self, text):
         if not self.threadState['downloadFinished']:
             return
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         self.threadState['downloadFinished'] = False
         self.threads.append(downloadFileThread(text, self.currentPath))
         self.threads[-1].finished.connect(self.finishDownloadFile)
@@ -396,8 +424,32 @@ class UniversalWindow(QWidget):
     def finishDownloadFile(self):
         if self.threadState['downloadFinished']:
             return
+        QApplication.restoreOverrideCursor()
+        self.threads.pop()
         self.threadState['downloadFinished'] = True
         self.refresh()
+
+    def downloadFilesList(self, files, path):
+        if len(files) == 0:
+            return
+        if not self.threadState['downloadFinished']:
+            return
+        self.threadState['downloadFinished'] = False
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        for i in files:
+            self.threads.append(downloadFileThread(i['text'], path))
+            self.threads[-1].finished.connect(self.finishDownloadFilesList)
+            self.threads[-1].start()
+
+    def finishDownloadFilesList(self):
+        if self.threadState['downloadFinished']:
+            return
+        self.refresh()
+        for i in self.threads:
+            if i.isRunning:
+                return
+        QApplication.restoreOverrideCursor()
+        self.threadState['downloadFinished'] = True
 
     def initiateSubjects(self):
         if self.threadState['downloadFinished'] and self.threadState['initFinished']:
