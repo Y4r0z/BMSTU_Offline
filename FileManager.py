@@ -19,6 +19,7 @@ class FileManager():
             'assign':QIcon("icons/assign.png"),
             'resource':QIcon("icons/resource.png"),
             'course':QIcon("icons/course.png"),
+            'folder':QIcon("icons/folder.png"),
             'pdf':QIcon("icons/pdf.png"),
             'zip':QIcon("icons/zip.png"),
             'doc':QIcon("icons/doc.png"),
@@ -209,4 +210,5 @@ class FileManager():
             self.saveDownloads()
         os.remove(path)
         return True
+
 

@@ -319,6 +319,50 @@ class DataManager():
     def setDownloads(self, downloads):
         self.downloads = downloads
 
+    def findByName(self, text, path):
+        subjects = self.getSubjects()
+        n = len(path)
+        for i in subjects:
+            if n == 0:
+                if i['text'] == text:
+                    return i
+                continue
+            if i['text'] != path[0]: continue
+            activities = self.getActivities(i['id'])
+            for j in activities:
+                if n == 1:
+                    if j['text'] == text:
+                        return j
+                    continue
+                if j['text'] != path[1] or j['files'] is None: continue
+                for k in j['files']:
+                    if k['text'] == text:
+                        return k
+                    if ki['text'] != path[2]: continue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -116,17 +116,32 @@ class UniversalWindow(QWidget):
         if event.type() == QEvent.ContextMenu and source is self.ui.list:
             menu = QMenu('Предмет')
             icons = FileManager().getIcons()
+            item = source.itemAt(event.pos())
+            obj = DataManager().findByName(item.text(), self.currentPath)
             if self.mode == 0:
                  menu.addAction(icons['open'], 'Открыть')
+            elif self.mode == 1:
+                if obj['type'] == 'assign':
+                    menu.addAction(icons['open'], 'Открыть')
+                    if not DataManager().isDownloaded(obj['href']):
+                        menu.addAction(icons['download'], 'Скачать всё')
+                if obj['type'] not in ['assign', 'folder']:
+                    if DataManager().isDownloaded(obj['href']):
+                        menu.addAction(icons['open'], 'Открыть')
+                    else:
+                        menu.addAction(icons['download'], 'Скачать')
+                    menu.addAction(icons['delete'], 'Удалить')
             else:
-                 menu.addAction(icons['open'], 'Открыть / Скачать')
-                 menu.addAction(icons['delete'], 'Удалить')
+                if DataManager().isDownloaded(obj['href']):
+                     menu.addAction(icons['open'], 'Открыть')
+                else:
+                     menu.addAction(icons['download'], 'Скачать')
+                menu.addAction(icons['delete'], 'Удалить')
 
             action = menu.exec(event.globalPos())
             if action:
-                item = source.itemAt(event.pos())
                 text = action.text()
-                if text == 'Открыть' or text == 'Скачать' or text == 'Открыть / Скачать':
+                if text == 'Открыть' or text == 'Скачать':
                     self.openClicked(item)
                 elif text == 'Удалить':
                     self.deleteFileClicked(item)

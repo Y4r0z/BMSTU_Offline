@@ -22,6 +22,8 @@ class CustomList():
             item = QListWidgetItem(self.icons['assign'], text)
         elif type == 'resource':
             item = QListWidgetItem(self.icons['resource'], text)
+        elif type == 'folder':
+            item = QListWidgetItem(self.icons['folder'], text)
         elif type == 'course':
             if len(state.keys()) == 0 or state['courseState'] is None:
                 item = QListWidgetItem(self.icons['course'], text)
