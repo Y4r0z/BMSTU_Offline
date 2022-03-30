@@ -1,3 +1,3 @@
 {
-    "files": ["courseForm.ui","AssignForm.ui","SettingsWindow.py","CourseWindow.py","DataManager.py","SplashScreenForm.ui","mainForm.ui","FileManager.py","main.py","SplashScreen.py","AssignWindow.py","UniversalWindow.py","AuthForm.ui","SettingsForm.ui","AuthWindow.py","UniversalForm.ui","MainWindow.py","Threads.py","data.py","CustomList.py"]
+    "files": ["UniversalWindow.py","data.py","main.py","FileManager.py","SplashScreenForm.ui","Threads.py","SettingsForm.ui","CustomList.py","DataManager.py","SplashScreen.py","UniversalForm.ui","SettingsWindow.py","AuthWindow.py","AuthForm.ui"]
 }
