@@ -102,15 +102,14 @@ class DataManager():
 
         with self.session.get(s['href']) as coursePage:
             if coursePage.status_code == 200:
-                #coursePage.raw.decode_content = True
-                #tree = lxml.html.parse(coursePage.raw)
                 tree = lxml.html.fromstring(coursePage.text)
                 topics = tree.xpath('//*[@id="region-main"]/div/div/div/div/ul')
                 if len(topics) == 0:
                     return []
                 acts = topics[0].xpath('//*[starts-with(@id,"module")]')
                 for i in acts:
-                    try:
+                    #try:
+                    if True:
                         #get type
                         type = i.get('class').split(' ')[1].lower()
                         if type in ['assign', 'resource']:
@@ -120,22 +119,33 @@ class DataManager():
                                 continue
                             text = textraw[0]
                             #Get href
-                            activityLink = i.xpath('div/div/div[2]/div[1]/a')[0].get('href')
+                            activity = i.xpath('div/div/div[2]/div[1]/a')[0]
+                            activityLink = activity.get('href')
                             #get type for resource
                             if type == 'resource':
+                                source = activity.xpath('img')[0].get('src')
+                                type = source.split('/')[-1].split('-')[0]
                                 downloadLink = self.session.get(activityLink, allow_redirects=False)
                                 tree2 = lxml.html.fromstring(downloadLink.text)
-                                t = tree2.xpath('//*[@id="region-main"]/div/a')
-                                tempHref = t[0].get('href')
-                                type = tempHref.split('.')[-1].split('?')[0]
+                                if type == 'mp3':
+                                    t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
+                                    tempHref = t[0].get('src')
+                                    type = tempHref.split('/')[-1].split('.')[-1]
+                                    activityLink = tempHref
+                                    text += ' аудио'
+                                else:
+                                    t = tree2.xpath('//*[@id="region-main"]/div/a')
+                                    tempHref = t[0].get('href')
+                                    type = tempHref.split('.')[-1].split('?')[0]
                             files = None
-                            if type == 'assign':
+                            if type in ['assign', 'folder']:
                                 files = []
                             if not asyncMode:
                                 s['activities'].append({'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
                             else:
                                 asyncArray.append( {'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
-                    except Exception as e:
+                    #except Exception as e:
+                    if False:
                         print('getActivities() error:')
                         print(e)
 
