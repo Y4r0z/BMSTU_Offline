@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.15.1, 2022-03-30T15:04:46. -->
+<!-- Written by QtCreator 4.15.1, 2022-04-01T13:46:35. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -853,6 +853,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">C:/Users/User/Documents/Qt/BMSTU_Offline/AuthWindow.py</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">PythonEditor.RunConfiguration.C:/Users/User/Documents/Qt/BMSTU_Offline/AuthWindow.py</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/Users/User/Documents/Qt/BMSTU_Offline/AuthWindow.py</value>
+    <value type="QString" key="PythonEditor.RunConfiguation.Interpreter">{ca3a603e-dc61-427e-9820-cb7184f27323}</value>
     <value type="QString" key="PythonEditor.RunConfiguation.Script">C:\Users\User\Documents\Qt\BMSTU_Offline\AuthWindow.py</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>

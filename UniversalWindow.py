@@ -335,7 +335,7 @@ class UniversalWindow(QWidget):
             if i['text'] != self.currentPath[0]:
                 continue
             for j in i['activities']:
-                if j['text'] == text and j['type'] == 'assign':
+                if j['text'] == text and j['type'] in ['assign', 'folder']:
                     if j['files'] is None or (len(j['files']) == 0 and not DataManager().isOnline):
                         return
                     list = CustomList(self.ui.list)
@@ -349,7 +349,7 @@ class UniversalWindow(QWidget):
                             list.addItem(k['text'], k['type'], DataManager().getDownload(k['href']))
                         except Exception as e:
                             list.addItem('Error')
-                            print('CourseWindow().generateSubjects() error:')
+                            print('CourseWindow().generateFiles() error:')
                             print(e)
                             continue
                     self.ui.label.setText(text)

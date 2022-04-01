@@ -59,7 +59,7 @@ class CustomList():
             item = QListWidgetItem(self.icons['txt'], text)
         elif type in ['xls', 'xlsx']:
             item = QListWidgetItem(self.icons['xls'], text)
-        elif type in ['ppt', 'pptx']:
+        elif type in ['ppt', 'pptx', 'ppsx']:
             item = QListWidgetItem(self.icons['ppt'], text)
         elif type == 'pdf':
             item = QListWidgetItem(self.icons['pdf'], text)

@@ -1,5 +1,6 @@
 import lxml.html
 import requests
+import urllib.parse
 from data import PostUrl
 from data import GetUrl
 import os
@@ -19,16 +20,28 @@ def getFiles(session, assign):
             if page.status_code == 200:
                 filesList = []
                 tree = lxml.html.fromstring(page.text)
-                files = tree.xpath("//div[@class='fileuploadsubmission']")
-                if len(files) == 0:
-                    return None
-                for i in files:
-                    name, type = os.path.splitext(i.xpath('img')[0].get('title'))
-                    type = type[1::]
-                    href = i.xpath('a')[0].values()[1]
-                    filesList.append({'text':name, 'href':href, 'type':type,
-                    'state':{}, 'parent':assign['href']
-                    })
+                if assign['type'] != 'folder':
+                    files = tree.xpath("//div[@class='fileuploadsubmission']")
+                    if len(files) == 0:
+                        return None
+                    for i in files:
+                        name, type = os.path.splitext(i.xpath('img')[0].get('title'))
+                        type = type[1::]
+                        href = i.xpath('a')[0].values()[1]
+                        filesList.append({'text':name, 'href':href, 'type':type,
+                        'state':{}, 'parent':assign['href']
+                        })
+                else:
+                    files = tree.xpath("//span[@class='fp-filename-icon']")
+                    if len(files) == 0:
+                        return None
+                    for i in files:
+                        href = i.xpath('a')[0].get('href')
+                        name, type = href.split('/')[-1].split('?')[0].split('.')
+                        name = urllib.parse.unquote(name)
+                        filesList.append({'text':name, 'href':href, 'type':type,
+                        'state':{}, 'parent':assign['href']
+                        })
                 return filesList
             else:
                 return []
@@ -108,11 +121,10 @@ class DataManager():
                     return []
                 acts = topics[0].xpath('//*[starts-with(@id,"module")]')
                 for i in acts:
-                    #try:
-                    if True:
+                    try:
                         #get type
                         type = i.get('class').split(' ')[1].lower()
-                        if type in ['assign', 'resource']:
+                        if type in ['assign', 'resource', 'folder']:
                             #get name
                             textraw = i.xpath('div/div/div[2]/div[1]/a/span/text()')
                             if len(textraw) == 0:
@@ -137,6 +149,8 @@ class DataManager():
                                     t = tree2.xpath('//*[@id="region-main"]/div/a')
                                     tempHref = t[0].get('href')
                                     type = tempHref.split('.')[-1].split('?')[0]
+                            elif type == 'folder':
+                                pass
                             files = None
                             if type in ['assign', 'folder']:
                                 files = []
@@ -144,8 +158,7 @@ class DataManager():
                                 s['activities'].append({'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
                             else:
                                 asyncArray.append( {'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
-                    #except Exception as e:
-                    if False:
+                    except Exception as e:
                         print('getActivities() error:')
                         print(e)
 
