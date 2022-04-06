@@ -121,9 +121,9 @@ class UniversalWindow(QWidget):
             if self.mode == 0:
                  menu.addAction(icons['open'], 'Открыть')
             elif self.mode == 1:
-                if obj['type'] == 'assign':
+                if obj['type'] in ['assign', 'folder']:
                     menu.addAction(icons['open'], 'Открыть')
-                    if not DataManager().isDownloaded(obj['href']):
+                    if DataManager().getDownload(obj['href'])['progress'] != 100:
                         menu.addAction(icons['download'], 'Скачать всё')
                 if obj['type'] not in ['assign', 'folder']:
                     if DataManager().isDownloaded(obj['href']):
