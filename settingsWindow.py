@@ -25,6 +25,7 @@ class SettingsWindow(QWidget):
         ui_file.open(QFile.ReadOnly)
         self.ui = loader.load(ui_file, self)
         self.setGeometry(self.ui.geometry())
+        self.setLayout(self.ui.layout())
         self.setWindowTitle('Settings')
         self.setWindowIcon(FileManager().getIcons()['settings'])
         ui_file.close()
@@ -38,6 +39,8 @@ class SettingsWindow(QWidget):
             self.mainWindow.initiateSubjects()
         else:
             print("SettingsWindow.saveSubjects() error. Can't save subjects in offline mode.")
+
+
 
 
     def closeEvent(self, event):

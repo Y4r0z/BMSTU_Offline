@@ -28,7 +28,6 @@ class AuthWindow(QMainWindow):
         ui_file.open(QFile.ReadOnly)
         self.ui = loader.load(ui_file, self)
         self.setGeometry(self.ui.geometry())
-        #self.ui.show()
         self.show()
         self.setWindowTitle('Авторизация BMSTU')
         self.setWindowIcon(FileManager().getIcons()['bmstu'])
@@ -58,9 +57,7 @@ class AuthWindow(QMainWindow):
             self.mainWindow.loadWidgets()
             self.mainWindow.show()
             self.hide()
-            #self.mainWindow.ui.saveButton.setEnabled(False)
-            #self.mainWindow.ui.saveButton.hide()
-            #self.mainWindow.ui.saveBar.hide()
+
         else:
             QApplication.setQuitOnLastWindowClosed(False);
             msg = QMessageBox()

@@ -20,7 +20,6 @@ Modes:
 1 - Assigns
 2 - Files
 """
-CyrillicTranslateAlphabet = dict(zip(list("qwertyuiop[]asdfghjkl;'zxcvbnm,."), list('йцукенгшщзхъфывапролджэячсмитьбю')))
 
 class UniversalWindow(QWidget):
     def __init__(self):
@@ -258,8 +257,8 @@ class UniversalWindow(QWidget):
     def generateSubjects(self, filter = None):
         size = self.ui.list.count()
         row = self.ui.list.currentRow()
-        list = CustomList(self.ui.list)
-        list.clear()
+        cList = CustomList(self.ui.list)
+        cList.clear()
         subjects = DataManager().getSubjects()
         self.ui.label.setText('Мои курсы')
         state = {}
@@ -270,13 +269,14 @@ class UniversalWindow(QWidget):
                 state[i['href']] = None
         if filter is None:        
             for i in subjects:
-                list.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
         else:
+            CyrillicTranslateAlphabet = dict(zip(list("qwertyuiop[]asdfghjkl;'zxcvbnm,."), list('йцукенгшщзхъфывапролджэячсмитьбю')))
             find = False
             for i in subjects:
                 if i['text'].lower().find(filter) != -1:
                     find = True
-                    list.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                    cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
             if not find:
                 text = []
                 for i in filter:
@@ -286,7 +286,7 @@ class UniversalWindow(QWidget):
                         text.append(i)
                 for i in subjects:
                     if i['text'].lower().find(''.join(text)) != -1:
-                        list.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                        cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
         if self.ui.list.count() > 0:
             if size == self.ui.list.count():
                 self.ui.list.setCurrentRow(row)
