@@ -14,6 +14,26 @@ def getCookie(session):
         cookieValue = cookieElement.value
     return cookieValue
 
+def loginOnline(login, password, session):
+    payload = {
+    'username' : login,
+    'password' : password,
+    'execution' : getCookie(session),
+    '_eventId' : 'submit'
+    }
+    return session.post(PostUrl, data = payload, stream = True)
+
+
+def endSession(session):
+    with session.get('https://e-learning.bmstu.ru/kaluga/') as page:
+        if page.status_code == 200:
+            tree = lxml.html.fromstring(page.text)
+            exit = tree.xpath('//*[@id="action-menu-1-menu"]/a[5]')
+            if(len(exit) == 0):
+                return
+            href = exit[0].values()[0]
+            session.get(href)
+
 def getFiles(session, assign):
     try:
         with session.get(assign['href']) as page:
@@ -74,6 +94,7 @@ class DataManager():
             cls.isOnline = False
             cls.dataInitiated = False
         return cls.__instance
+
 
     def getSubjects(self):
         if len(self.subjects) > 0:
@@ -180,14 +201,7 @@ class DataManager():
     def endSession(self):
         if not self.isOnline:
             return
-        with self.session.get('https://e-learning.bmstu.ru/kaluga/') as page:
-            if page.status_code == 200:     
-                tree = lxml.html.fromstring(page.text)
-                exit = tree.xpath('//*[@id="action-menu-1-menu"]/a[5]')
-                if(len(exit) == 0):
-                    return
-                href = exit[0].values()[0]
-                end = self.session.get(href)
+        endSession(self.session)
 
     def initiateData(self):
         subs = self.getSubjects()
@@ -217,15 +231,8 @@ class DataManager():
         self.subjects = []
         self.initiateData()
 
-
-    def login(self, login, password):
-        payload = {
-        'username' : login,
-        'password' : password,
-        'execution' : getCookie(self.session),
-        '_eventId' : 'submit'
-        }
-        response = self.session.post(PostUrl, data = payload, stream = True)
+    def login(self, username, password):
+        response = loginOnline(username, password, self.session)
         self.loginResult = response
         if response.status_code == 200:
             return True

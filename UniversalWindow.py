@@ -32,7 +32,7 @@ class UniversalWindow(QWidget):
         self.isFilterSaved = True
 
         self.threads = []
-        self.threadState = {'downloadFinished':True, 'initFinished':True}
+        self.threadState = {'downloadFinished': True, 'initFinished': True}
         self.initiatedSubjects = {}
 
         self.settingsWindow = SettingsWindow(self)
@@ -80,6 +80,7 @@ class UniversalWindow(QWidget):
         self.changeTabs()
 
     def closeEvent(self, event):
+        self.hide()
         DataManager().endSession()
         QApplication.quit();
 

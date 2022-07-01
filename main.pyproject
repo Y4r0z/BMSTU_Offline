@@ -1,3 +1,3 @@
 {
-    "files": ["UniversalWindow.py","data.py","main.py","FileManager.py","SplashScreenForm.ui","Threads.py","SettingsForm.ui","CustomList.py","DataManager.py","SplashScreen.py","UniversalForm.ui","SettingsWindow.py","AuthWindow.py","AuthForm.ui"]
+    "files": ["AuthWindow.py","main.py","SplashScreenForm.ui","data.py","SplashScreen.py","SettingsForm.ui","CustomList.py","SettingsWindow.py","AuthForm.ui","UniversalWindow.py","FileManager.py","Threads.py","DataManager.py","UniversalForm.ui"]
 }
