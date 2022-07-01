@@ -12,7 +12,7 @@ from FileManager import FileManager
 from DataManager import DataManager
 from CustomList import CustomList
 from Threads import *
-from settingsWindow import SettingsWindow
+from windows.settingsWindow import SettingsWindow
 
 """
 Modes:

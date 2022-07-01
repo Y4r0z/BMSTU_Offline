@@ -2,9 +2,11 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QPushButton, QHBoxLa
 from PySide6.QtGui import QIcon, QPainter, QPixmap
 from PySide6.QtCore import QSize, Qt, QRect
 from FileManager import FileManager
+
+
+
 class CustomList():
     def __init__(self, ui_list):
-        super(CustomList, self).__init__()
         self.list = ui_list
         self.icons = FileManager().getIcons()
     def getList(self):

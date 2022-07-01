@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon
 from FileManager import FileManager
 from DataManager import DataManager
 from Threads import LoginThread
-from SplashScreen import SplashScreen
+from windows.SplashScreen import SplashScreen
 
 class AuthWindow(QMainWindow):
 

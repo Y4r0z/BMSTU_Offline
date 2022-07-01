@@ -5,41 +5,13 @@ import os
 import sys
 import requests
 import subprocess
-
+from IconsManager import IconsManager
 class FileManager():
     __instance = None
     def __new__(cls):
         if cls.__instance is None:
             cls.__instance = super(FileManager, cls).__new__(cls)
-            cls._icons =\
-            {
-            'download':QIcon("icons/download.png"),
-            'delete':QIcon("icons/delete.png"),
-            'open':QIcon("icons/open.png"),
-            'assign':QIcon("icons/assign.png"),
-            'resource':QIcon("icons/resource.png"),
-            'course':QIcon("icons/course.png"),
-            'folder':QIcon("icons/folder.png"),
-            'pdf':QIcon("icons/pdf.png"),
-            'zip':QIcon("icons/zip.png"),
-            'doc':QIcon("icons/doc.png"),
-            'txt':QIcon("icons/txt.png"),
-            'xls':QIcon("icons/xls.png"),
-            'ppt':QIcon("icons/ppt.png"),
-            'unknown':QIcon("icons/unknown.png"),
-            'image':QIcon("icons/image.png"),
-            'audio':QIcon("icons/audio.png"),
-            'bmstu':QIcon("icons/bmstu.png"),
-            'saved':QIcon("icons/saved.png"),
-            'unsaved':QIcon("icons/unsaved.png"),
-            'semisaved':QIcon("icons/semiSaved.png"),
-            'return':QIcon("icons/return.png"),
-            'settings':QIcon("icons/settings.png"),
-            'courseSaved':QIcon("icons/courseSaved.png"),
-            'courseSemiSaved':QIcon("icons/courseSemiSaved.png"),
-            'courseUnsaved':QIcon("icons/courseUnsaved.png")
-            }
-
+            cls._icons = IconsManager()
         if not os.path.exists('data'):
             os.makedirs('data')
         if not os.path.exists('repository'):
