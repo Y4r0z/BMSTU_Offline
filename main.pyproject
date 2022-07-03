@@ -1,3 +1,3 @@
 {
-    "files": ["UniversalWindow.py","windows/AuthWindow.py","SplashScreenForm.ui","windows/SettingsForm.ui","windows/UniversalWindow.py","UniversalForm.ui","DataManager.py","main.py","AuthForm.ui","data.py","SettingsForm.ui","SettingsWindow.py","windows/settingsWindow.py","windows/SplashScreen.py","FileManager.py","windows/AuthForm.ui","windows/SplashScreenForm.ui","windows/UniversalForm.ui","CustomList.py","Threads.py","SplashScreen.py","AuthWindow.py","IconsManager.py"]
+    "files": ["FileManager.py","SettingsForm.ui","SplashScreen.py","windows/SettingsForm.ui","IconsManager.py","windows/SplashScreen.py","windows/SplashScreenForm.ui","AuthForm.ui","main.py","windows/settingsWindow.py","AuthWindow.py","UniversalForm.ui","windows/UniversalWindow.py","DataManager.py","windows/AuthForm.ui","windows/UniversalForm.ui","Threads.py","SettingsWindow.py","SplashScreenForm.ui","data.py","windows/AuthWindow.py","CustomList.py","UniversalWindow.py","Debugger.py"]
 }

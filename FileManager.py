@@ -6,6 +6,7 @@ import sys
 import requests
 import subprocess
 from IconsManager import IconsManager
+from Debugger import Debugger
 class FileManager():
     __instance = None
     def __new__(cls):
@@ -32,20 +33,19 @@ class FileManager():
                 DataManager().setSubjects(data)
             return True
         except:
-            print('Cant open "data/subjects.json"!')
+            Debugger().throw('Cant open "data/subjects.json"!')
             return False
 
     def saveDownloads(self):
         if not DataManager().dataInitiated and False:
-            print("Can't save downloads info without Datamanager's init!")
+            Debugger().throw("Can't save downloads info without Datamanager's init!")
             return False
         jsonString = json.dumps(DataManager().getDownloads(), ensure_ascii=False)
         try:
             with open('data/downloads.json', 'w', encoding = 'utf-8') as file:
                 file.write(jsonString)
         except Exception as e:
-            print('Cant save Downloads!')
-            print(e)
+            Debugger().throw('Cant save Downloads!\n' + e)
             return False
         return True
 
@@ -56,7 +56,7 @@ class FileManager():
                 downloads = json.load(file)
                 DataManager().setDownloads(downloads)
         except:
-            print('Cant load downloads!')
+            Debugger().throw('Cant load downloads!')
             return False
         return True
 
@@ -81,8 +81,7 @@ class FileManager():
                 DataManager().setUser(data[0]['login'], data[0]['password'])
             return True
         except Exception as e:
-            print('Cant open data/user.json')
-            print(e)
+            Debugger().throw('Cant open data/user.json\n' + e)
             return False
 
     def saveSettings(self, settings = None):
@@ -99,13 +98,12 @@ class FileManager():
                 DataManager().setSettings(data)
             return True
         except Exception as e:
-            print('Cant open data/settings.json')
-            print(e)
+            Debugger().throw('Cant open data/settings.json\n' + e)
             return False
 
     def downloadFile(self, name, wPath):
         if not DataManager().isOnline:
-            print('DataManager().downloadFile(). Datamanager is not online!')
+            Debugger().throw('FileManager().downloadFile(). The program is not online!')
             return False
         path, file = DataManager().getFilePath(name, wPath)
         if len(path) < 2:
@@ -130,8 +128,7 @@ class FileManager():
             self.saveDownloads()
             return True
         except Exception as e:
-            print('Cant download file')
-            print(e)
+            Debugger().throw('Cant download file\n' + e)
             return False
 
     def openFile(self, text, wPath):
@@ -166,6 +163,8 @@ class FileManager():
         if len(pathRaw) == 0:
             return False
         path = '/'.join(pathRaw[0])
+        if not os.path.exists(path):
+            Debugger().throw('File does not exists: ' + path)
         DataManager().removeDownload(file['href'])
         self.saveDownloads()
         parent = DataManager().getFileParent(file, wPath)

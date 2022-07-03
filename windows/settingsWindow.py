@@ -8,7 +8,7 @@ from pathlib import Path
 
 from FileManager import FileManager
 from DataManager import DataManager
-
+from Debugger import Debugger
 
 class SettingsWindow(QWidget):
     def __init__(self, mainwindow):
@@ -38,7 +38,7 @@ class SettingsWindow(QWidget):
         if DataManager().isOnline:
             self.mainWindow.initiateSubjects()
         else:
-            print("SettingsWindow.saveSubjects() error. Can't save subjects in offline mode.")
+            Debugger().throw("SettingsWindow.saveSubjects() error. Can't save subjects in offline mode.")
 
 
 

@@ -4,7 +4,7 @@ import urllib.parse
 from data import PostUrl
 from data import GetUrl
 import os
-
+from Debugger import Debugger
 
 def getCookie(session):
     cookiePath = '//*[@id="fm1"]/section[4]/input[1]'
@@ -66,8 +66,7 @@ def getFiles(session, assign):
             else:
                 return []
     except Exception as e:
-        print('getFiles() error:')
-        print(e)
+        Debugger().throw('getFiles() error:\n' + e)
 
 
 
@@ -118,7 +117,7 @@ class DataManager():
 
             mainPage.close()
         else:
-            print('Main page response error!')
+            Debugger().throw('Main page response error!')
         return self.subjects
 
     def getActivities(self, id, asyncMode = False):
@@ -129,7 +128,7 @@ class DataManager():
             if i['id'] == id:
                 s = i
         if s is None:
-            print(f"getActivities() can't find ID {id}!")
+            Debugger().throw(f"getActivities() can't find ID {id}!")
             return []
         if len(s['activities']) > 0:
             return s['activities']
@@ -180,12 +179,11 @@ class DataManager():
                             else:
                                 asyncArray.append( {'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
                     except Exception as e:
-                        print('getActivities() error:')
-                        print(e)
+                        Debugger().throw('getActivities() error:\n' + e)
 
                         continue
             else:
-                print('Course page response error!')
+                Debugger().throw('Course page response error!')
         if asyncMode:
             return asyncArray
         return s['activities']
@@ -218,11 +216,11 @@ class DataManager():
         if len(self.subjects) == 0:
             self.subjects = data
         else:
-            print("DataManaget().setSubjects(data): self.subjects isn't empty")
+            Debugger().throw("DataManaget().setSubjects(data): self.subjects isn't empty")
 
     def setUser(self, l, p):
         if l is None or p is None:
-            print('DataManager().setUser(log, pas): log or pas is None')
+            Debugger().throw('DataManager().setUser(log, pas): log or pas is None')
         else:
             self.username = l
             self.password = p
@@ -290,7 +288,7 @@ class DataManager():
     def getFilePath(self, text, path):
         rawPath, file, fileext = self.getRawPath(text, path)
         if file is None or len(rawPath) == 0:
-            print('DM().getFilePath() cant get path.')
+            Debugger().throw('DM().getFilePath() cant get path.')
             return ([], None)
         chars = [i for i in(' -./<>:"\|?*#%&{}$!@=+`,()' + "'")]
         path = []
@@ -300,7 +298,7 @@ class DataManager():
                 if not j in chars:
                     temp += j
             path.append(temp)
-        #print(1, rawPath, '|', fileext)
+        #Debugger().throw(1, rawPath, '|', fileext)
         path[-1] = path[-1]+fileext
         return (path, file)
 

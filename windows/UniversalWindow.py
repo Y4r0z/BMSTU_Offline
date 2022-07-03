@@ -13,6 +13,7 @@ from DataManager import DataManager
 from CustomList import CustomList
 from Threads import *
 from windows.settingsWindow import SettingsWindow
+from Debugger import Debugger
 
 """
 Modes:
@@ -82,6 +83,7 @@ class UniversalWindow(QWidget):
     def closeEvent(self, event):
         self.hide()
         DataManager().endSession()
+        Debugger().endSession()
         QApplication.quit();
 
     def refresh(self):
@@ -214,7 +216,7 @@ class UniversalWindow(QWidget):
             FileManager().deleteFile(file['text'], self.currentPath)
             self.refresh()
         else:
-            print('UniversalWindow().deleteFileClicked() - The file is not downlaoded!')
+            Debugger().throw('UniversalWindow().deleteFileClicked() - The file is not downlaoded!')
             return
 
     def tryOpenFile(self, text):
@@ -231,18 +233,18 @@ class UniversalWindow(QWidget):
         text = item.text()
         assign = DataManager().findByName(text, self.currentPath)
         if DataManager().getDownload(assign['href'])['progress'] == 100:
-            print("downloadAssign() is already downloaded")
+            Debugger().throw("downloadAssign() is already downloaded")
             return
         if assign is None:
-            print("downloadAssign() can't find an assign")
+            Debugger().throw("downloadAssign() can't find an assign")
             return
         if assign['files'] is None:
-            print("downloadAssign() can't store any files")
+            Debugger().throw("downloadAssign() can't store any files")
             return
         if len(assign['files']) == 0:
             assign['files'] = DataManager().getFiles(assign)
             if assign['files'] is None or len(assign['files']) == 0:
-                print("downloadAssign() don't have any files")
+                Debugger().throw("downloadAssign() don't have any files")
                 return
         downloadList = []
         for i in assign['files']:
@@ -298,7 +300,7 @@ class UniversalWindow(QWidget):
     def generateActivities(self, item = None, customText = None):
         if customText is None:
             if item is None:
-                print('UniversalWindow.generateActiviteis requires at least 1 argument!')
+                Debugger().throw('UniversalWindow.generateActiviteis requires at least 1 argument!')
                 return
             text = item.text()
         else:
@@ -318,7 +320,7 @@ class UniversalWindow(QWidget):
                         list.addItem(j['text'], j['type'], DataManager().getDownload(j['href']))
                     except Exception as e:
                         list.addItem('Error')
-                        print(e)
+                        Debugger().throw(e)
                         continue
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
@@ -326,7 +328,7 @@ class UniversalWindow(QWidget):
     def generateFiles(self, item = None, customText = None):
         if customText is None:
             if item is None:
-                print('UniversalWindow.generateFiles requires at least 1 argument!')
+                Debugger().throw('UniversalWindow.generateFiles requires at least 1 argument!')
                 return
             text = item.text()
         else:
@@ -350,8 +352,7 @@ class UniversalWindow(QWidget):
                             list.addItem(k['text'], k['type'], DataManager().getDownload(k['href']))
                         except Exception as e:
                             list.addItem('Error')
-                            print('CourseWindow().generateFiles() error:')
-                            print(e)
+                            Debugger().throw('CourseWindow().generateFiles() error:\n' + e)
                             continue
                     self.ui.label.setText(text)
                     self.currentPath = [self.currentPath[0], text]
@@ -414,6 +415,9 @@ class UniversalWindow(QWidget):
         FileManager().saveSettings()
 
     def downloadFile(self, text):
+        if not DataManager().isOnline:
+            Debugger().throw("UniversalWindow.downloadFile. Program is not online!")
+            return
         if not self.threadState['downloadFinished']:
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
