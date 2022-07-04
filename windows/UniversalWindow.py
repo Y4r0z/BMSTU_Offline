@@ -22,7 +22,6 @@ Modes:
 1 - Assigns
 2 - Files
 """
-
 class UniversalWindow(QWidget):
     def __init__(self):
         super(UniversalWindow, self).__init__()
@@ -353,7 +352,7 @@ class UniversalWindow(QWidget):
                             list.addItem(k['text'], k['type'], DataManager().getDownload(k['href']))
                         except Exception as e:
                             list.addItem('Error')
-                            Debugger().throw('CourseWindow().generateFiles() error:\n' + e)
+                            Debugger().throw('CourseWindow().generateFiles() error:\n' + str(e))
                             continue
                     self.ui.label.setText(text)
                     self.currentPath = [self.currentPath[0], text]

@@ -45,7 +45,7 @@ class FileManager():
             with open('data/downloads.json', 'w', encoding = 'utf-8') as file:
                 file.write(jsonString)
         except Exception as e:
-            Debugger().throw('Cant save Downloads!\n' + e)
+            Debugger().throw('Cant save Downloads!\n' + str(e))
             return False
         return True
 
@@ -81,7 +81,7 @@ class FileManager():
                 DataManager().setUser(data[0]['login'], data[0]['password'])
             return True
         except Exception as e:
-            Debugger().throw('Cant open data/user.json\n' + e)
+            Debugger().throw('Cant open data/user.json\n' + str(e))
             return False
 
     def saveSettings(self, settings = None):
@@ -98,7 +98,7 @@ class FileManager():
                 DataManager().setSettings(data)
             return True
         except Exception as e:
-            Debugger().throw('Cant open data/settings.json\n' + e)
+            Debugger().throw('Cant open data/settings.json\n' + str(e))
             return False
 
     def downloadFile(self, name, wPath):
@@ -128,7 +128,7 @@ class FileManager():
             self.saveDownloads()
             return True
         except Exception as e:
-            Debugger().throw('Cant download file\n' + e)
+            Debugger().throw('Cant download file\n' + str(e))
             return False
 
     def openFile(self, text, wPath):

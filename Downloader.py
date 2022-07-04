@@ -12,9 +12,7 @@ class DownloadItem(QObject):
         self.path = _path
 
     def execute(self):
-        Debugger().throw("DI_Execute: " + self.name)
         FileManager().downloadFile(self.name, self.path)
-        Debugger().throw("DI_Execute complete")
         self.complete.emit()
 
 
@@ -28,27 +26,21 @@ class DownloaderThread(QThread):
     def push(self, item):
         while True:
             if downloaderMutex.tryLock():
-                Debugger().throw("DT_push")
                 self.queue.append(item)
                 downloaderMutex.unlock()
                 return
-            Debugger().throw("Attempt to push")
             QThread.msleep(20)
 
     def run(self):
         currentTask = None
         while True:
             QThread.msleep(150)
-            Debugger().throw("wait, len: " + str(len(self.queue)))
             if len(self.queue) == 0:
                 continue
             if downloaderMutex.tryLock():
                 currentTask = self.queue.pop()
                 downloaderMutex.unlock()
                 currentTask.execute()
-
-
-
 
 
 
