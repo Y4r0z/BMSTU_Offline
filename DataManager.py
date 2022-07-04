@@ -1,73 +1,9 @@
 import lxml.html
 import requests
 import urllib.parse
-from data import PostUrl
-from data import GetUrl
 import os
 from Debugger import Debugger
-
-def getCookie(session):
-    cookiePath = '//*[@id="fm1"]/section[4]/input[1]'
-    with session.get(GetUrl) as response:
-        tree = lxml.html.fromstring(response.text)
-        cookieElement = tree.xpath(cookiePath)[0]
-        cookieValue = cookieElement.value
-    return cookieValue
-
-def loginOnline(login, password, session):
-    payload = {
-    'username' : login,
-    'password' : password,
-    'execution' : getCookie(session),
-    '_eventId' : 'submit'
-    }
-    return session.post(PostUrl, data = payload, stream = True)
-
-
-def endSession(session):
-    with session.get('https://e-learning.bmstu.ru/kaluga/') as page:
-        if page.status_code == 200:
-            tree = lxml.html.fromstring(page.text)
-            exit = tree.xpath('//*[@id="action-menu-1-menu"]/a[5]')
-            if(len(exit) == 0):
-                return
-            href = exit[0].values()[0]
-            session.get(href)
-
-def getFiles(session, assign):
-    try:
-        with session.get(assign['href']) as page:
-            if page.status_code == 200:
-                filesList = []
-                tree = lxml.html.fromstring(page.text)
-                if assign['type'] != 'folder':
-                    files = tree.xpath("//div[@class='fileuploadsubmission']")
-                    if len(files) == 0:
-                        return None
-                    for i in files:
-                        name, type = os.path.splitext(i.xpath('img')[0].get('title'))
-                        type = type[1::]
-                        href = i.xpath('a')[0].values()[1]
-                        filesList.append({'text':name, 'href':href, 'type':type,
-                        'state':{}, 'parent':assign['href']
-                        })
-                else:
-                    files = tree.xpath("//span[@class='fp-filename-icon']")
-                    if len(files) == 0:
-                        return None
-                    for i in files:
-                        href = i.xpath('a')[0].get('href')
-                        name, type = href.split('/')[-1].split('?')[0].split('.')
-                        name = urllib.parse.unquote(name)
-                        filesList.append({'text':name, 'href':href, 'type':type,
-                        'state':{}, 'parent':assign['href']
-                        })
-                return filesList
-            else:
-                return []
-    except Exception as e:
-        Debugger().throw('getFiles() error:\n' + str(e))
-
+from NetworkFunctions import *
 
 
 class DataManager():
@@ -100,93 +36,21 @@ class DataManager():
             return self.subjects
         if self.loginResult is None:
             return []
-        mainPage = self.loginResult
-        coursesPath = '//*[@id="frontpage-course-list"]/div/div'
-        if mainPage.status_code == 200:
-            mainPage.raw.decode_content = True
-            tree = lxml.html.parse(mainPage.raw)
-            for i in tree.xpath(coursesPath):
-                course = i.xpath('div[1]/h3/a')
-                if (len(course) > 0):
-                    courseID = i.values()[1]
-                    self.subjects.append(
-                    {'text':course[0].text,
-                    'href':course[0].values()[1],
-                    'id':courseID,
-                    'activities':[]})
-
-            mainPage.close()
-        else:
-            Debugger().throw('Main page response error!')
+        try:
+            self.subjects = getSubjects(self.session, self.loginResult)
+        except Exception as e:
+            Debugger().throw("getSubjects() error:\n" + str(e))
         return self.subjects
 
-    def getActivities(self, id, asyncMode = False):
+    def getActivities(self, id):
         subjects = self.getSubjects()
-        asyncArray = []
-        s = None
-        for i in subjects:
-            if i['id'] == id:
-                s = i
-        if s is None:
-            Debugger().throw(f"getActivities() can't find ID {id}!")
-            return []
-        if len(s['activities']) > 0:
-            return s['activities']
+        try:
+            activities = getActivities(self.session, id, subjects)
+            return activities
+        except Exception as e:
+            Debugger().throw("GetActivities() error:\n" + str(e))
+        return []
 
-        with self.session.get(s['href']) as coursePage:
-            if coursePage.status_code == 200:
-                tree = lxml.html.fromstring(coursePage.text)
-                topics = tree.xpath('//*[@id="region-main"]/div/div/div/div/ul')
-                if len(topics) == 0:
-                    return []
-                acts = topics[0].xpath('//*[starts-with(@id,"module")]')
-                for i in acts:
-                    try:
-                        #get type
-                        type = i.get('class').split(' ')[1].lower()
-                        if type in ['assign', 'resource', 'folder']:
-                            #get name
-                            textraw = i.xpath('div/div/div[2]/div[1]/a/span/text()')
-                            if len(textraw) == 0:
-                                continue
-                            text = textraw[0]
-                            #Get href
-                            activity = i.xpath('div/div/div[2]/div[1]/a')[0]
-                            activityLink = activity.get('href')
-                            #get type for resource
-                            if type == 'resource':
-                                source = activity.xpath('img')[0].get('src')
-                                type = source.split('/')[-1].split('-')[0]
-                                downloadLink = self.session.get(activityLink, allow_redirects=False)
-                                tree2 = lxml.html.fromstring(downloadLink.text)
-                                if type == 'mp3':
-                                    t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
-                                    tempHref = t[0].get('src')
-                                    type = tempHref.split('/')[-1].split('.')[-1]
-                                    activityLink = tempHref
-                                    text += ' аудио'
-                                else:
-                                    t = tree2.xpath('//*[@id="region-main"]/div/a')
-                                    tempHref = t[0].get('href')
-                                    type = tempHref.split('.')[-1].split('?')[0]
-                            elif type == 'folder':
-                                pass
-                            files = None
-                            if type in ['assign', 'folder']:
-                                files = []
-                            if not asyncMode:
-                                s['activities'].append({'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
-                            else:
-                                asyncArray.append( {'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
-                    except Exception as e:
-                        Debugger().throw('getActivities() error:\n' + str(e))
-
-                        continue
-            else:
-                Debugger().throw('Course page response error!')
-        if asyncMode:
-            return asyncArray
-        return s['activities']
 
     def getFiles(self, assign):
         files = getFiles(self.session, assign)

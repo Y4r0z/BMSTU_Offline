@@ -4,6 +4,7 @@ import time
 class Debugger:
     __instance = None
     logs = []
+    saveLogs = False
     def __new__(self):
         if self.__instance is None:
             self.__instance = super(Debugger,self).__new__(self)
@@ -21,6 +22,8 @@ class Debugger:
         if len(self.logs) == 0:
             return
         self.throw('debug endSession')
+        if not self.saveLogs:
+            return
         date = dt.now().strftime('%d%m%y')
         time = dt.now().strftime('%H%M%S')
         with open('logs_' + date + '_' + time + '.txt', 'w') as file:
