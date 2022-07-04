@@ -18,7 +18,7 @@ class IconsManager:
             icon = QIcon(path)
         except:
             icon = False
-            Debugger().throw("IconsManager.__add() faield!")
+            Debugger().throw("IconsManager.__add() failed!")
         if icon is False:
             return
         self.icons[name] = icon

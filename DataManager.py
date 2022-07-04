@@ -66,7 +66,7 @@ def getFiles(session, assign):
             else:
                 return []
     except Exception as e:
-        Debugger().throw('getFiles() error:\n' + e)
+        Debugger().throw('getFiles() error:\n' + str(e))
 
 
 
@@ -179,7 +179,7 @@ class DataManager():
                             else:
                                 asyncArray.append( {'text':text, 'type':type, 'href':activityLink, 'files':files, 'parent':s['href']})
                     except Exception as e:
-                        Debugger().throw('getActivities() error:\n' + e)
+                        Debugger().throw('getActivities() error:\n' + str(e))
 
                         continue
             else:

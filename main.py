@@ -9,4 +9,5 @@ if __name__ == "__main__":
     widget = UniversalWindow()
     widget.hide()
     auth = AuthWindow(widget)
+
     sys.exit(app.exec())

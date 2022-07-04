@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import time
 
 class Debugger:
     __instance = None
@@ -25,6 +26,9 @@ class Debugger:
         with open('logs_' + date + '_' + time + '.txt', 'w') as file:
             for i in self.logs:
                 file.write(i + '\n')
+
+    def wait(self, waitTime):
+        time.sleep(waitTime/1000)
 
 
 

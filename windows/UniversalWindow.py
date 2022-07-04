@@ -14,6 +14,7 @@ from CustomList import CustomList
 from Threads import *
 from windows.settingsWindow import SettingsWindow
 from Debugger import Debugger
+from Downloader import Downloader, DownloadItem
 
 """
 Modes:
@@ -418,43 +419,18 @@ class UniversalWindow(QWidget):
         if not DataManager().isOnline:
             Debugger().throw("UniversalWindow.downloadFile. Program is not online!")
             return
-        if not self.threadState['downloadFinished']:
-            return
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        self.threadState['downloadFinished'] = False
-        self.threads.append(downloadFileThread(text, self.currentPath))
-        self.threads[-1].finished.connect(self.finishDownloadFile)
-        self.threads[-1].start()
-
-    def finishDownloadFile(self):
-        if self.threadState['downloadFinished']:
-            return
-        QApplication.restoreOverrideCursor()
-        self.threads.pop()
-        self.threadState['downloadFinished'] = True
-        self.refresh()
+        item = DownloadItem(text, self.currentPath)
+        item.complete.connect(self.refresh)
+        Downloader().push(item)
 
     def downloadFilesList(self, files, path):
         if len(files) == 0:
             return
-        if not self.threadState['downloadFinished']:
-            return
-        self.threadState['downloadFinished'] = False
-        QApplication.setOverrideCursor(Qt.WaitCursor)
         for i in files:
-            self.threads.append(downloadFileThread(i['text'], path))
-            self.threads[-1].finished.connect(self.finishDownloadFilesList)
-            self.threads[-1].start()
+            item = DownloadItem(i['text'], path)
+            item.complete.connect(self.refresh)
+            Downloader().push(item)
 
-    def finishDownloadFilesList(self):
-        if self.threadState['downloadFinished']:
-            return
-        self.refresh()
-        for i in self.threads:
-            if i.isRunning:
-                return
-        QApplication.restoreOverrideCursor()
-        self.threadState['downloadFinished'] = True
 
     def initiateSubjects(self):
         if self.threadState['downloadFinished'] and self.threadState['initFinished']:
