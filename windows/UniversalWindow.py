@@ -95,9 +95,11 @@ class UniversalWindow(QWidget):
         if self.mode == 0:
             self.generateSubjects(DataManager().getSettings()['filter'])
         elif self.mode == 1:
-            self.generateActivities(customText = self.currentPath[0])
+            listItem = DataManager().findByName(self.currentPath[0])
+            self.generateActivities(listItem)
         elif self.mode == 2:
-            self.generateFiles(customText = self.currentPath[1])
+            listItem = DataManager().findByName(self.currentPath[-1], self.currentPath)
+            self.generateFiles(listItem)
         if scrollRange == scrollBar.maximum():
             scrollBar.setSliderPosition(scrollValue)
             row = self.ui.list.setCurrentRow(row)
@@ -190,7 +192,8 @@ class UniversalWindow(QWidget):
         text = self.currentPath[0]
         self.currentPath.pop(-1)
         self.mode = 1
-        self.generateActivities(customText = text)
+        listItem = DataManager().findByName(text)
+        self.generateActivities(listItem)
         self.changeTabs()
 
     def openClicked(self, item):
@@ -200,10 +203,12 @@ class UniversalWindow(QWidget):
             for i in DataManager().getSubjects():
                 if item.text() == i['text'] and not self.threadState['initFinished'] and self.initiatedSubjects[i['href']] != 100:
                     return
-            self.generateActivities(item)
+            listItem = DataManager().findByName(item.text())
+            self.generateActivities(listItem)
             self.mode = 1
         elif self.mode == 1:
-            self.generateFiles(item)
+            listItem = DataManager().findByName(item.text(), self.currentPath)
+            self.generateFiles(listItem)
             self.mode = 2
         self.changeTabs()
 
@@ -273,14 +278,14 @@ class UniversalWindow(QWidget):
                 state[i['href']] = None
         if filter is None:        
             for i in subjects:
-                cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                cList.addItem(i, {'courseState':state[i['href']]})
         else:
             CyrillicTranslateAlphabet = dict(zip(list("qwertyuiop[]asdfghjkl;'zxcvbnm,."), list('йцукенгшщзхъфывапролджэячсмитьбю')))
             find = False
             for i in subjects:
                 if i['text'].lower().find(filter) != -1:
                     find = True
-                    cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                    cList.addItem(i, {'courseState':state[i['href']]})
             if not find:
                 text = []
                 for i in filter:
@@ -290,7 +295,7 @@ class UniversalWindow(QWidget):
                         text.append(i)
                 for i in subjects:
                     if i['text'].lower().find(''.join(text)) != -1:
-                        cList.addItem(i['text'], 'course', {'courseState':state[i['href']]})
+                        cList.addItem(i, {'courseState':state[i['href']]})
         if self.ui.list.count() > 0:
             if size == self.ui.list.count():
                 self.ui.list.setCurrentRow(row)
@@ -298,67 +303,44 @@ class UniversalWindow(QWidget):
                 self.ui.list.setCurrentRow(0)
         self.clickedRow = self.ui.list.currentRow()
 
-    def generateActivities(self, item = None, customText = None):
-        if customText is None:
-            if item is None:
-                Debugger().throw('UniversalWindow.generateActiviteis requires at least 1 argument!')
-                return
-            text = item.text()
-        else:
-            text = customText
-        subjects = DataManager().getSubjects()
-        for i in subjects:
-            if i['text'] == text:
-                list = CustomList(self.ui.list)
-                list.clear()
-                acts = DataManager().getActivities(i)
-                if len(acts) == 0:
-                    return
-                self.ui.label.setText(i['text'])
-                self.currentPath = [i['text']]
-                for j in acts:
-                    try:
-                        list.addItem(j['text'], j['type'], DataManager().getDownload(j['href']))
-                    except Exception as e:
-                        list.addItem('Error')
-                        Debugger().throw(e)
-                        continue
+    def generateActivities(self, listItem):
+        list = CustomList(self.ui.list)
+        list.clear()
+        activities = DataManager().getActivities(listItem)
+        if len(activities) == 0: return
+        self.ui.label.setText(listItem['text'])
+        self.currentPath = [listItem['text']]
+        self.mode = 1
+        for i in activities:
+            try:
+                list.addItem(i, DataManager().getDownload(i['href']))
+            except Exception as e:
+                list.addItem('Error')
+                Debugger().throw("UniversalWindow.generateActivities error:\n" + str(e))
+                continue
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
 
-    def generateFiles(self, item = None, customText = None):
-        if customText is None:
-            if item is None:
-                Debugger().throw('UniversalWindow.generateFiles requires at least 1 argument!')
+    def generateFiles(self, listItem):
+        if listItem['type'] not in ['assign', 'folder']:
+            return
+        if len(listItem['files']) == 0 and DataManager().isOnline:
+            listItem.set(DataManager().getFiles(listItem))
+            if listItem['files'] is None or len(listItem['files']) == 0:
                 return
-            text = item.text()
-        else:
-            text = customText
-        subjects = DataManager().getSubjects()
-        for i in subjects:
-            if i['text'] != self.currentPath[0]:
+        list = CustomList(self.ui.list)
+        list.clear()
+        for i in listItem['files']:
+            try:
+                list.addItem(i, DataManager().getDownload(i['href']))
+            except Exception as e:
+                list.addItem('Error')
+                Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))
                 continue
-            for j in i['activities']:
-                if j['text'] == text and j['type'] in ['assign', 'folder']:
-                    if j['files'] is None or (len(j['files']) == 0 and not DataManager().isOnline):
-                        return
-                    list = CustomList(self.ui.list)
-                    list.clear()
-                    if(len(j['files']) == 0 and DataManager().isOnline):
-                        j['files'] = DataManager().getFiles(j)
-                        if j['files'] is None or len(j['files']) == 0:
-                            return
-                    for k in j['files']:
-                        try:
-                            list.addItem(k['text'], k['type'], DataManager().getDownload(k['href']))
-                        except Exception as e:
-                            list.addItem('Error')
-                            Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))
-                            continue
-                    self.ui.label.setText(text)
-                    self.currentPath = [self.currentPath[0], text]
-            if self.ui.list.count() > 0:
-                self.ui.list.setCurrentRow(0)
+        self.ui.label.setText(listItem.text)
+        self.currentPath = [self.currentPath[0], listItem.text]
+        if self.ui.list.count() > 0:
+            self.ui.list.setCurrentRow(0)
 
     def changeTabs(self):
         begin = self.ui.beginTab

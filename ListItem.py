@@ -7,6 +7,7 @@ class ListItem:
         self._type = type
         self._href = href
         self._downloadProgress = progress
+        self.parent = None
         #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
@@ -14,6 +15,7 @@ class ListItem:
         ('type'): self._type,
         ('href', 'link'): self._href,
         ('state', 'download', 'downloadState', 'downloadProgress'): self._downloadProgress,
+        ('parent'): self.parent
         }
 
     @property
@@ -61,7 +63,7 @@ class ListItem:
 class ListFile(ListItem):
     def __init__(self, text, type, href, progress=0):
         super().__init__(text, type, href, progress)
-        self.path = "unknown_path"
+        self.path = None
         self._properties[('path')] = self.path
 
     def contextAction(self):
@@ -82,7 +84,11 @@ class ListStorage(ListItem):
         self.storage.append(item)
 
     def set(self, lst):
-        self.storage = lst
+        self.storage.clear()
+        if lst is None or len(lst) == 0:
+            return
+        for i in lst:
+            self.storage.append(i)
 
     def contextAction(self):
         pass

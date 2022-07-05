@@ -67,6 +67,7 @@ def getFiles(session, assign):
                         })
                 return filesList
             else:
+                Debugger().throw('getFiles() response error')
                 return []
     except Exception as e:
         Debugger().throw('getFiles() error:\n' + str(e))

@@ -2,7 +2,6 @@ import requests
 from Debugger import Debugger
 from NetworkFunctions import *
 from ListItem import ListFile, ListStorage
-
 class DataManager():
     __instance = None
     def __new__(cls):
@@ -48,7 +47,9 @@ class DataManager():
             rawActivities = getActivities(self.session, subject)
             activities = []
             for i in rawActivities:
-                activities.append(ListStorage(i['text'], i['type'], i['href'], i['files']))
+                activity = ListStorage(i['text'], i['type'], i['href'], i['files'])
+                activity.parent = subject
+                activities.append(activity)
             return activities
         except Exception as e:
             Debugger().throw("GetActivities() error:\n" + str(e))
@@ -58,10 +59,12 @@ class DataManager():
     def getFiles(self, assign):
         rawFiles = getFiles(self.session, assign)
         files = []
-        for i in rawFiles:
-            files.append(ListFile(i['text'], i['type'], i['href']))
-        if files is None:
+        if rawFiles is None or len(rawFiles) == 0:
             return None
+        for i in rawFiles:
+            file = ListFile(i['text'], i['type'], i['href'])
+            file.parent = i
+            files.append(file)
         for i in files:
             self.loadedFiles.append(i)
         return files
@@ -79,7 +82,7 @@ class DataManager():
                 if j['files'] is None:
                     continue
                 if len(j['files']) == 0 and j['type'] == 'assign':
-                    j['files'] = self.getFiles(j)
+                    j.set( self.getFiles(j))
         self.dataInitiated = True
 
     def setSubjects(self, data):
@@ -125,6 +128,21 @@ class DataManager():
                 if j['text'] == path[1] and j['href'] == file['parent']:
                     return j
         return None
+
+
+
+    def generateFilePathList(self, file, localPathList):
+        rawFileName = file.text
+        fileExtension = '.' + file.type
+        rawPathList = ['repository'] + localPathList + [rawFileName]
+        forbiddenChars = [i for i in(' -./<>:"\|?*#%&{}$!@=+`,()' + "'")]
+        for i in range(len(rawPathList)):
+            newStr = ''.join(c for c in rawPathList[i] if c not in forbiddenChars)
+            rawPathList[i] = newStr
+        rawPathList[-1] = rawPathList[-1] + fileExtension
+        print("new path: ")
+        print(rawPathList)
+        return rawPathList
 
 
     def getRawPath(self, text, path):
@@ -207,7 +225,7 @@ class DataManager():
     def setDownloads(self, downloads):
         self.downloads = downloads
 
-    def findByName(self, text, path):
+    def findByName(self, text, path = []):
         subjects = self.getSubjects()
         n = len(path)
         for i in subjects:

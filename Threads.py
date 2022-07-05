@@ -38,11 +38,11 @@ class InitSubjectsThread(QThread):
         size = len(subs)
         for i in subs:
             #self.initState[i['href']] = 50
-            acts = DataManager().getActivities(i['id'])
+            acts = DataManager().getActivities(i)
             n = 0
             for j in acts:
                 if j['type'] in ['assign', 'folder']:
-                    j['files'] = DataManager().getFiles(j)
+                    j.set(DataManager().getFiles(j))
                 n += 1
                 self.initState[i['href']] = (n / len(acts)) * 100
                 self.clk.emit(self.progress)

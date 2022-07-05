@@ -15,7 +15,9 @@ class CustomList():
     def clear(self):
         self.list.clear()
 
-    def addItem(self, text, type = None, state = {}):
+    def addItem(self, listItem, state):
+        type = listItem.type
+        text = listItem.text
         if not type is None:
             type = type.lower()
         if type is None:
@@ -54,7 +56,6 @@ class CustomList():
                     painter.end()
                     newIcon = QIcon(pm)
                     item = QListWidgetItem(newIcon, text)
-
         elif type in ['doc', 'docx']:
             item = QListWidgetItem(self.icons['doc'], text)
         elif type == 'txt':
