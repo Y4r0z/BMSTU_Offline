@@ -15,6 +15,7 @@ from Threads import *
 from windows.settingsWindow import SettingsWindow
 from Debugger import Debugger
 from Downloader import Downloader, DownloadItem
+from ListItem import ListFile, ListStorage
 
 """
 Modes:
@@ -352,7 +353,7 @@ class UniversalWindow(QWidget):
                             list.addItem(k['text'], k['type'], DataManager().getDownload(k['href']))
                         except Exception as e:
                             list.addItem('Error')
-                            Debugger().throw('CourseWindow().generateFiles() error:\n' + str(e))
+                            Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))
                             continue
                     self.ui.label.setText(text)
                     self.currentPath = [self.currentPath[0], text]

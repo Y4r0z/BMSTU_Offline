@@ -1,11 +1,11 @@
 import lxml.html
-import requests
 import urllib.parse
 import os
 from Debugger import Debugger
 
 PostUrl = 'https://proxy.bmstu.ru:8443/cas/login?service=https%3A%2F%2Fe-learning.bmstu.ru%2Fkaluga%2Flogin%2Findex.php%3FauthCAS%3DCAS'
 GetUrl = 'https://proxy.bmstu.ru:8443/cas/login?service=https://e-learning.bmstu.ru/kaluga/login/index.php?authCAS=CAS'
+
 
 def getCookie(session):
     cookiePath = '//*[@id="fm1"]/section[4]/input[1]'
@@ -14,6 +14,7 @@ def getCookie(session):
         cookieElement = tree.xpath(cookiePath)[0]
         cookieValue = cookieElement.value
     return cookieValue
+
 
 def loginOnline(login, password, session):
     payload = {
@@ -34,6 +35,7 @@ def endSession(session):
                 return
             href = exit[0].values()[0]
             session.get(href)
+
 
 def getFiles(session, assign):
     try:
@@ -94,6 +96,7 @@ def getSubjects(session, loginResult):
     else:
         Debugger().throw('Main page response error!')
     return subjects
+
 
 def getActivities(session, id, subjects):
     s = None #subject to find

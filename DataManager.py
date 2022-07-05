@@ -1,10 +1,7 @@
-import lxml.html
 import requests
-import urllib.parse
-import os
 from Debugger import Debugger
 from NetworkFunctions import *
-
+from ListItem import ListFile, ListStorage
 
 class DataManager():
     __instance = None
@@ -53,7 +50,10 @@ class DataManager():
 
 
     def getFiles(self, assign):
-        files = getFiles(self.session, assign)
+        rawFiles = getFiles(self.session, assign)
+        files = []
+        for i in rawFiles:
+            files.append(ListFile(i['text'], i['type'], i['href']))
         if files is None:
             return None
         for i in files:
