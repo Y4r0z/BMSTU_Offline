@@ -311,7 +311,7 @@ class UniversalWindow(QWidget):
             if i['text'] == text:
                 list = CustomList(self.ui.list)
                 list.clear()
-                acts = DataManager().getActivities(i['id'])
+                acts = DataManager().getActivities(i)
                 if len(acts) == 0:
                     return
                 self.ui.label.setText(i['text'])

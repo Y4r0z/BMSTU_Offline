@@ -34,15 +34,21 @@ class DataManager():
         if self.loginResult is None:
             return []
         try:
-            self.subjects = getSubjects(self.session, self.loginResult)
+            rawSubjects = getSubjects(self.session, self.loginResult)
+            subjects = []
+            for i in rawSubjects:
+                subjects.append(ListStorage(i['text'], 'course', i['href'], i['activities']))
+            self.subjects = subjects
         except Exception as e:
             Debugger().throw("getSubjects() error:\n" + str(e))
         return self.subjects
 
-    def getActivities(self, id):
-        subjects = self.getSubjects()
+    def getActivities(self, subject):
         try:
-            activities = getActivities(self.session, id, subjects)
+            rawActivities = getActivities(self.session, subject)
+            activities = []
+            for i in rawActivities:
+                activities.append(ListStorage(i['text'], i['type'], i['href'], i['files']))
             return activities
         except Exception as e:
             Debugger().throw("GetActivities() error:\n" + str(e))
@@ -68,7 +74,7 @@ class DataManager():
     def initiateData(self):
         subs = self.getSubjects()
         for i in subs:
-            acts = self.getActivities(i['id'])
+            acts = self.getActivities(i)
             for j in acts:
                 if j['files'] is None:
                     continue
@@ -114,7 +120,7 @@ class DataManager():
         for i in subs:
             if i['text'] != path[0]:
                 continue
-            acts = self.getActivities(i['id'])
+            acts = self.getActivities(i)
             for j in acts:
                 if j['text'] == path[1] and j['href'] == file['parent']:
                     return j
@@ -127,7 +133,7 @@ class DataManager():
         for i in subs:
             if i['text'] != path[0]:
                 continue        
-            acts = self.getActivities(i['id'])
+            acts = self.getActivities(i)
             for j in acts:
                 if j['text'] == text and len(path) == 1:
                     file = j
@@ -210,7 +216,7 @@ class DataManager():
                     return i
                 continue
             if i['text'] != path[0]: continue
-            activities = self.getActivities(i['id'])
+            activities = self.getActivities(i)
             for j in activities:
                 if n == 1:
                     if j['text'] == text:

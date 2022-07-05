@@ -98,14 +98,7 @@ def getSubjects(session, loginResult):
     return subjects
 
 
-def getActivities(session, id, subjects):
-    s = None #subject to find
-    for i in subjects:
-        if i['id'] == id:
-            s = i
-    if s is None:
-        Debugger().throw(f"getActivities() can't find ID {id}!")
-        return []
+def getActivities(session, s):
     if len(s['activities']) > 0:
         return s['activities']
     with session.get(s['href']) as coursePage:

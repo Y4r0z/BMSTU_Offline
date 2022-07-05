@@ -2,12 +2,12 @@
 
 class ListItem:
 
-    def __init__(self, text = 'item_text', type = 'item_type', href = 'item_href', progress = 0):
+    def __init__(self, text='item_text', type='item_type', href='item_href', progress=0):
         self._text = text
         self._type = type
         self._href = href
         self._downloadProgress = progress
-        #В списке хранятся именя, которые ассоциируются со свойством
+        #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
         ('name', 'text'): self._text,
@@ -59,7 +59,7 @@ class ListItem:
 
 
 class ListFile(ListItem):
-    def __init__(self, text, type, href, progress = 0.0):
+    def __init__(self, text, type, href, progress=0):
         super().__init__(text, type, href, progress)
         self.path = "unknown_path"
         self._properties[('path')] = self.path
@@ -73,9 +73,10 @@ class ListFile(ListItem):
 
 class ListStorage(ListItem):
 
-    def __init__(self, text, type, href, progress = 0):
+    def __init__(self, text, type, href, storage=[], progress=0):
         super().__init__(text, type, href, progress)
-        self.storage = []
+        self.storage = storage
+        self._properties[('files', 'activities')] = self.storage
 
     def add(self, item):
         self.storage.append(item)
