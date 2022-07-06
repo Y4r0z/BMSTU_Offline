@@ -128,16 +128,16 @@ class UniversalWindow(QWidget):
             elif self.mode == 1:
                 if obj['type'] in ['assign', 'folder']:
                     menu.addAction(icons['open'], 'Открыть')
-                    if DataManager().getDownload(obj['href'])['progress'] != 100:
+                    if obj['download'] != 100:
                         menu.addAction(icons['download'], 'Скачать всё')
                 if obj['type'] not in ['assign', 'folder']:
-                    if DataManager().isDownloaded(obj['href']):
+                    if obj['download'] == 100:
                         menu.addAction(icons['open'], 'Открыть')
                     else:
                         menu.addAction(icons['download'], 'Скачать')
                     menu.addAction(icons['delete'], 'Удалить')
             else:
-                if DataManager().isDownloaded(obj['href']):
+                if obj['download'] == 100:
                      menu.addAction(icons['open'], 'Открыть')
                 else:
                      menu.addAction(icons['download'], 'Скачать')
@@ -216,7 +216,7 @@ class UniversalWindow(QWidget):
         if self.mode == 0:
             return
         file = DataManager().findByName(item.text(), self.currentPath)
-        if DataManager().isDownloaded(file['href']):
+        if file['download'] == 100:
             FileManager().deleteFile(file)
             self.refresh()
         else:
@@ -227,7 +227,7 @@ class UniversalWindow(QWidget):
         file = DataManager().findByName(text, self.currentPath)
         if file is None or file['type'] in ListStorage.Types:
             return False
-        if DataManager().isDownloaded(file['href']):
+        if file['download'] == 100:
             FileManager().openFile(file)
         else:
             self.downloadFile(file)
@@ -236,7 +236,7 @@ class UniversalWindow(QWidget):
     def downloadAssign(self, item):
         text = item.text()
         assign = DataManager().findByName(text, self.currentPath)
-        if DataManager().getDownload(assign['href'])['progress'] == 100:
+        if assign['download'] == 100 == 100:
             Debugger().throw("downloadAssign() is already downloaded")
             return
         if assign is None:
@@ -252,7 +252,7 @@ class UniversalWindow(QWidget):
                 return
         downloadList = []
         for i in assign['files']:
-            if not DataManager().isDownloaded(i['href']):
+            if i['download'] != 100:
                 downloadList.append(i)
         self.downloadFilesList(downloadList)
 
@@ -309,7 +309,7 @@ class UniversalWindow(QWidget):
         self.mode = 1
         for i in activities:
             try:
-                list.addItem(i, DataManager().getDownload(i['href']))
+                list.addItem(i, {'progress': i['download']})
             except Exception as e:
                 Debugger().throw("UniversalWindow.generateActivities error:\n" + str(e))
                 list.addItem('Error')
@@ -328,7 +328,7 @@ class UniversalWindow(QWidget):
         list.clear()
         for i in listItem['files']:
             try:
-                list.addItem(i, DataManager().getDownload(i['href']))
+                list.addItem(i, {'progress': i['download']})
             except Exception as e:
                 list.addItem('Error')
                 Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))

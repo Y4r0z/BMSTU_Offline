@@ -37,30 +37,6 @@ class FileManager():
             Debugger().throw('Cant open "data/subjects.json"!')
             return False
 
-    def saveDownloads(self):
-        if not DataManager().dataInitiated and False:
-            Debugger().throw("Can't save downloads info without Datamanager's init!")
-            return False
-        jsonString = json.dumps(DataManager().getDownloads(), ensure_ascii=False)
-        try:
-            with open('data/downloads.json', 'w', encoding = 'utf-8') as file:
-                file.write(jsonString)
-        except Exception as e:
-            Debugger().throw('Cant save Downloads!\n' + str(e))
-            return False
-        return True
-
-    def loadDownloads(self):
-        downloads = []
-        try:
-            with open ('data/downloads.json', 'r', encoding = 'utf-8') as file:
-                downloads = json.load(file)
-                DataManager().setDownloads(downloads)
-        except:
-            Debugger().throw('Cant load downloads!')
-            return False
-        return True
-
     def getIcons(self):
         return self._icons
 
@@ -106,7 +82,7 @@ class FileManager():
         if not DataManager().isOnline:
             Debugger().throw('FileManager().downloadFile(). The program is not online!')
             return False
-        rawPath = DataManager().generateFilePathList(file)
+        rawPath = file.path
         try:
             dir = DataManager().listToPath(rawPath[:-1])
             if not os.path.exists(dir):
@@ -114,17 +90,16 @@ class FileManager():
             filename = rawPath[-1]
             fullPath = f'{dir}/{filename}'
             with open(fullPath, 'wb') as f:
-                f.write(DataManager().getDownloadData(file['href']))
-            DataManager().addDownload(file['href'])
+                f.write(DataManager().getDownloadData(file))
+            file.downloadProgress = 100
             parent = file.parent
             if parent is not None:
                 cnt = len(parent['files'])
                 n = 0
                 for f in parent['files']:
-                    if DataManager().isDownloaded(f['href']):
+                    if f['download'] > 0:
                         n += 1
-                DataManager().addDownload(parent['href'], n/cnt*100)
-            self.saveDownloads()
+                parent.downloadProgress = n/cnt*100
             return True
         except Exception as e:
             Debugger().throw('Cant download file\n' + str(e))
@@ -133,7 +108,7 @@ class FileManager():
     def openFile(self, file):
         if not DataManager().isDownloaded(file['href']):
             return False
-        path = DataManager().listToPath(DataManager().generateFilePathList(file))
+        path = DataManager().listToPath(file.path)
         if sys.platform.startswith('win'):
             subprocess.Popen(path, shell = True)
         else: #Linux костыл
@@ -150,25 +125,23 @@ class FileManager():
         return True
 
     def deleteFile(self, file):
-        if not DataManager().isDownloaded(file['href']):
+        if file['download'] < 100:
             return False
-        path = DataManager().listToPath(DataManager().generateFilePathList(file))
+        path = DataManager().listToPath(file.path)
         if not os.path.exists(path):
             Debugger().throw('File does not exists: ' + path)
-        DataManager().removeDownload(file['href'])
-        self.saveDownloads()
+        file.downloadProgress = 0
         parent = file.parent
         if parent is not None:
             cnt = len(parent['files'])
             n = 0
             for f in parent['files']:
-                if DataManager().isDownloaded(f['href']):
+                if f['download'] > 0:
                     n+=1
             if n != 0:
-                DataManager().addDownload(parent['href'], n/cnt*100)
+                parent.downloadProgress = n/cnt*100
             else:
-                DataManager().removeDownload(parent['href'])
-            self.saveDownloads()
+                parent.downloadProgress = 0
         os.remove(path)
         return True
 

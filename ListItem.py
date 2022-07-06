@@ -41,6 +41,7 @@ class ListItem:
         if new > 100:
             new = 100
         self._downloadProgress = new
+        self._properties[('state', 'download', 'downloadState', 'downloadProgress')] = self._downloadProgress
 
     def getProperty(self, key):
         ret = None

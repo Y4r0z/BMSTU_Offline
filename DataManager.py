@@ -11,7 +11,6 @@ class DataManager():
             cls.__instance = super(DataManager, cls).__new__(cls)
             cls.session = requests.Session()
             cls.subjects = []
-            cls.downloads = []
             cls.loadedFiles = []
             cls.username = None
             cls.password = None
@@ -45,6 +44,8 @@ class DataManager():
         return self.subjects
 
     def getActivities(self, subject):
+        if len(subject['files']) != 0:
+            return subject['files']
         try:
             rawActivities = getActivities(self.session, subject)
             activities = []
@@ -59,7 +60,6 @@ class DataManager():
                 activities.append(activity)
             if len(subject.storage) == 0:
                 subject.set(activities)
-
             return activities
         except Exception as e:
             Debugger().throw("GetActivities() error:\n" + str(e))
@@ -169,39 +169,10 @@ class DataManager():
         rawPathList[-1] = rawPathList[-1] + fileExtension
         return rawPathList
 
-    def getDownloadData(self, href):
-        r = self.session.get(href)
+    def getDownloadData(self, file):
+        r = self.session.get(file['href'])
         return r.content
 
-    def isDownloaded(self, href):
-        for i in self.downloads:
-            if i['href'] == href:
-                return True
-        return False
-
-    def getDownload(self, href):
-        for i in self.downloads:
-            if i['href'] == href:
-                return i
-        return {'href':None, 'progress':0}
-
-    def addDownload(self, href, progress = 100):
-        if not self.isDownloaded(href):
-            self.downloads.append({'href':href, 'progress':progress})
-        else:
-            self.getDownload(href)['progress'] = progress
-        if type is None:
-            return
-
-    def removeDownload(self, href):
-        self.downloads = [i for i in self.downloads if i['href'] != href]
-
-
-    def getDownloads(self):
-        return self.downloads
-
-    def setDownloads(self, downloads):
-        self.downloads = downloads
 
     def findByName(self, text, path = []):
         subjects = self.getSubjects()
@@ -218,7 +189,7 @@ class DataManager():
                     if j['text'] == text:
                         return j
                     continue
-                if j['text'] != path[1] or j['files'] is None: continue
+                if j['text'] != path[1] or j['files'] is None or len(j['files']) == 0: continue
                 for k in j['files']:
                     if k['text'] == text:
                         return k

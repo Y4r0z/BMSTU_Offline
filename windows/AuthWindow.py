@@ -52,7 +52,6 @@ class AuthWindow(QMainWindow):
     def authOffline(self):
         if FileManager().loadSubjects():
             FileManager().loadSettings()
-            FileManager().loadDownloads()
             DataManager().isOnline = False
             self.mainWindow.loadWidgets()
             self.mainWindow.show()
@@ -87,7 +86,6 @@ class AuthWindow(QMainWindow):
     def authOnlineSuccess(self):
         DataManager().isOnline = True
         FileManager().loadSettings()
-        FileManager().loadDownloads()
         if self.ui.rememberMe.isChecked():
             login = self.ui.loginEdit.text()
             password = self.ui.passwordEdit.text()
