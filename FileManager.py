@@ -21,8 +21,9 @@ class FileManager():
         return cls.__instance
 
     def saveSubjects(self):
-        DataManager().initiateData()
-        jsonString = json.dumps(DataManager().getSubjects(), ensure_ascii=False)
+        #DataManager().initiateData()
+        subjects = DataManager().getSubjects()
+        jsonString = json.dumps([i.toDict() for i in DataManager().getSubjects()], ensure_ascii=False)
         with open('data/subjects.json', 'w', encoding = 'utf-8') as file:
             file.write(jsonString)
 
@@ -101,29 +102,27 @@ class FileManager():
             Debugger().throw('Cant open data/settings.json\n' + str(e))
             return False
 
-    def downloadFile(self, name, wPath):
+    def downloadFile(self, file):
         if not DataManager().isOnline:
             Debugger().throw('FileManager().downloadFile(). The program is not online!')
             return False
-        path, file = DataManager().getFilePath(name, wPath)
-        if len(path) < 2:
-            return False
+        rawPath = DataManager().generateFilePathList(file)
         try:
-            dir = '/'.join([path[i] for i in range(0, len(path)-1)])
+            dir = DataManager().listToPath(rawPath[:-1])
             if not os.path.exists(dir):
                 os.makedirs(dir)
-            filename = path[-1]
+            filename = rawPath[-1]
             fullPath = f'{dir}/{filename}'
             with open(fullPath, 'wb') as f:
                 f.write(DataManager().getDownloadData(file['href']))
             DataManager().addDownload(file['href'])
-            parent = DataManager().getFileParent(file, wPath)
-            if not parent is None:
+            parent = file.parent
+            if parent is not None:
                 cnt = len(parent['files'])
                 n = 0
                 for f in parent['files']:
                     if DataManager().isDownloaded(f['href']):
-                        n+=1
+                        n += 1
                 DataManager().addDownload(parent['href'], n/cnt*100)
             self.saveDownloads()
             return True
@@ -131,17 +130,13 @@ class FileManager():
             Debugger().throw('Cant download file\n' + str(e))
             return False
 
-    def openFile(self, text, wPath):
-        pathRaw = DataManager().getFilePath(text, wPath)
-        if not DataManager().isDownloaded(pathRaw[1]['href']):
+    def openFile(self, file):
+        if not DataManager().isDownloaded(file['href']):
             return False
-        if len(pathRaw) == 0:
-            return False
+        path = DataManager().listToPath(DataManager().generateFilePathList(file))
         if sys.platform.startswith('win'):
-            path = '\\'.join(pathRaw[0])
             subprocess.Popen(path, shell = True)
-        else:
-            path = '/'.join(pathRaw[0])
+        else: #Linux костыл
             myEnv = dict(os.environ)
             lp_key = 'LD_LIBRARY_PATH'
             lp_orig = myEnv.get(lp_key + '_ORIG')
@@ -152,23 +147,18 @@ class FileManager():
                 if lp is not None:
                     myEnv.pop(lp_key)
             subprocess.Popen(["xdg-open", path], env=myEnv)
-
         return True
 
-    def deleteFile(self, text, wPath):
-        pathRaw = DataManager().getFilePath(text, wPath)
-        file = pathRaw[1]
+    def deleteFile(self, file):
         if not DataManager().isDownloaded(file['href']):
             return False
-        if len(pathRaw) == 0:
-            return False
-        path = '/'.join(pathRaw[0])
+        path = DataManager().listToPath(DataManager().generateFilePathList(file))
         if not os.path.exists(path):
             Debugger().throw('File does not exists: ' + path)
         DataManager().removeDownload(file['href'])
         self.saveDownloads()
-        parent = DataManager().getFileParent(file, wPath)
-        if not parent is None:
+        parent = file.parent
+        if parent is not None:
             cnt = len(parent['files'])
             n = 0
             for f in parent['files']:

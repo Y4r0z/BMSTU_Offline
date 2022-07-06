@@ -103,6 +103,7 @@ def getActivities(session, s):
     if len(s['activities']) > 0:
         return s['activities']
     with session.get(s['href']) as coursePage:
+        activities = []
         if coursePage.status_code != 200:
             Debugger().throw('Course page response error!')
             return s['activities']
@@ -149,7 +150,7 @@ def getActivities(session, s):
                 files = None
                 if type in ['assign', 'folder']:
                     files = []
-                s['activities'].append({'text': text, 'type': type, 'href': activityLink, 'files': files, 'parent': s['href']})
+                activities.append({'text': text, 'type': type, 'href': activityLink, 'files': files, 'parent': s['href']})
             except Exception as e:
                 Debugger().throw("getActivites(). Some acts was passed because of:\n" + str(e))
-    return s['activities']
+    return activities

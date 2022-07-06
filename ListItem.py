@@ -1,5 +1,4 @@
 
-
 class ListItem:
 
     def __init__(self, text='item_text', type='item_type', href='item_href', progress=0):
@@ -8,6 +7,7 @@ class ListItem:
         self._href = href
         self._downloadProgress = progress
         self.parent = None
+        self.signature = None
         #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
@@ -54,17 +54,53 @@ class ListItem:
 
 
     def contextAction(self):
-        raise NotImplementedError("Context action not implemented!")
+        raise NotImplementedError("Context action is not implemented!")
 
     def onClickAction(self):
-        raise NotImplementedError("Click action not implemented!")
+        raise NotImplementedError("Click action is not implemented!")
+
+    def toDict(self):
+        raise NotImplementedError("Dictionary transformation is not implemented!")
+
+    def __str__(self):
+        return self._text
+
+    @staticmethod
+    def FromDict(self, dict):
+        item = None
+        text = dict['text']
+        type = dict['type']
+        href = dict['href']
+        download = dict['download']
+        if dict['signature'] == 'file':
+            item = ListFile(text, type, href)
+            item.path = dict['path']
+        else:
+            item = ListStorage(text, type, href)
+            item.set(dict['storage'])
+        item.downloadProgress = download
+        return item
 
 
 class ListFile(ListItem):
+    Signature = 'file'
     def __init__(self, text, type, href, progress=0):
         super().__init__(text, type, href, progress)
-        self.path = None
-        self._properties[('path')] = self.path
+        self._path = []
+        self.signature = self.Signature
+        self._properties[('path')] = self._path
+
+    @property
+    def path(self):
+        return self._path
+
+    @path.setter
+    def path(self, new):
+        self._path.clear()
+        if new is None or len(new) == 0:
+            return
+        for i in new:
+            self._path.append(i)
 
     def contextAction(self):
         pass
@@ -72,12 +108,26 @@ class ListFile(ListItem):
     def onClickAction(self):
         pass
 
+    def toDict(self):
+        dict = {}
+        dict['signature'] = self.Signature
+        dict['text'] = self._text
+        dict['type'] = self._type
+        dict['href'] = self._href
+        dict['download'] = self._downloadProgress
+        dict['path'] = self._path
+        return dict
+
 
 class ListStorage(ListItem):
+    Signature = 'storage'
+    Types = ['assign', 'folder', 'course']
 
-    def __init__(self, text, type, href, storage=[], progress=0):
+    def __init__(self, text, type, href, storage=None, progress=0):
         super().__init__(text, type, href, progress)
-        self.storage = storage
+        if storage is None: self.storage = []
+        else: self.storage = storage
+        self.signature = self.Signature
         self._properties[('files', 'activities')] = self.storage
 
     def add(self, item):
@@ -95,3 +145,13 @@ class ListStorage(ListItem):
 
     def onClickAction(self):
         pass
+
+    def toDict(self):
+        dict = {}
+        dict['signature'] = self.Signature
+        dict['text'] = self._text
+        dict['type'] = self._type
+        dict['href'] = self._href
+        dict['download'] = self._downloadProgress
+        dict['storage'] = [i.toDict() for i in self.storage]
+        return dict

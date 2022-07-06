@@ -6,13 +6,12 @@ from FileManager import FileManager
 
 class DownloadItem(QObject):
     complete = Signal()
-    def __init__(self, _name, _path):
+    def __init__(self, file):
         super().__init__()
-        self.name = _name
-        self.path = _path
+        self.file = file
 
     def execute(self):
-        FileManager().downloadFile(self.name, self.path)
+        FileManager().downloadFile(self.file)
         self.complete.emit()
 
 

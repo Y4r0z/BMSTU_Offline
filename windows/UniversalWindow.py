@@ -98,7 +98,7 @@ class UniversalWindow(QWidget):
             listItem = DataManager().findByName(self.currentPath[0])
             self.generateActivities(listItem)
         elif self.mode == 2:
-            listItem = DataManager().findByName(self.currentPath[-1], self.currentPath)
+            listItem = DataManager().findByName(self.currentPath[-1], [self.currentPath[0]])
             self.generateFiles(listItem)
         if scrollRange == scrollBar.maximum():
             scrollBar.setSliderPosition(scrollValue)
@@ -215,24 +215,22 @@ class UniversalWindow(QWidget):
     def deleteFileClicked(self, item):
         if self.mode == 0:
             return
-        path, file = DataManager().getFilePath(item.text(), self.currentPath)
-        if len(path) == 0 or file is None or file == '':
-            return
+        file = DataManager().findByName(item.text(), self.currentPath)
         if DataManager().isDownloaded(file['href']):
-            FileManager().deleteFile(file['text'], self.currentPath)
+            FileManager().deleteFile(file)
             self.refresh()
         else:
             Debugger().throw('UniversalWindow().deleteFileClicked() - The file is not downlaoded!')
             return
 
     def tryOpenFile(self, text):
-        file = DataManager().getFilePath(text, self.currentPath)[1]
-        if file is None or file['type'] in ['course', 'assign', 'folder']:
+        file = DataManager().findByName(text, self.currentPath)
+        if file is None or file['type'] in ListStorage.Types:
             return False
         if DataManager().isDownloaded(file['href']):
-            FileManager().openFile(file['text'], self.currentPath)
+            FileManager().openFile(file)
         else:
-            self.downloadFile(file['text'])
+            self.downloadFile(file)
         return True
 
     def downloadAssign(self, item):
@@ -256,9 +254,7 @@ class UniversalWindow(QWidget):
         for i in assign['files']:
             if not DataManager().isDownloaded(i['href']):
                 downloadList.append(i)
-        newPath = [i for i in self.currentPath]
-        newPath.append(text)
-        self.downloadFilesList(downloadList, newPath)
+        self.downloadFilesList(downloadList)
 
     def settingsButtonClicked(self):
         self.settingsWindow.show();
@@ -315,8 +311,8 @@ class UniversalWindow(QWidget):
             try:
                 list.addItem(i, DataManager().getDownload(i['href']))
             except Exception as e:
-                list.addItem('Error')
                 Debugger().throw("UniversalWindow.generateActivities error:\n" + str(e))
+                list.addItem('Error')
                 continue
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
@@ -397,19 +393,19 @@ class UniversalWindow(QWidget):
         self.ui.saveFilterButton.setIconSize(QSize(22, 22))
         FileManager().saveSettings()
 
-    def downloadFile(self, text):
+    def downloadFile(self, file):
         if not DataManager().isOnline:
             Debugger().throw("UniversalWindow.downloadFile. Program is not online!")
             return
-        item = DownloadItem(text, self.currentPath)
+        item = DownloadItem(file)
         item.complete.connect(self.refresh)
         Downloader().push(item)
 
-    def downloadFilesList(self, files, path):
+    def downloadFilesList(self, files):
         if len(files) == 0:
             return
         for i in files:
-            item = DownloadItem(i['text'], path)
+            item = DownloadItem(i)
             item.complete.connect(self.refresh)
             Downloader().push(item)
 

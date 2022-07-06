@@ -35,6 +35,9 @@ class SettingsWindow(QWidget):
         ui.saveSubjects.clicked.connect(self.saveSubjectsClicked);
 
     def saveSubjectsClicked(self):
+        #Debug
+        FileManager().saveSubjects()
+        return
         if DataManager().isOnline:
             self.mainWindow.initiateSubjects()
         else:
