@@ -64,6 +64,9 @@ class ListItem:
     def __str__(self):
         return self._text
 
+    #
+    # Добавить родителя в .parent
+    #
     @staticmethod
     def FromDict(dict):
         item = None

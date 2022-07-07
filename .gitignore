@@ -14,3 +14,10 @@ build/
 Test.qml
 
 TestForm.ui.qml
+
+.vscode/
+
+main.pyproject
+
+main.pyproject.user
+

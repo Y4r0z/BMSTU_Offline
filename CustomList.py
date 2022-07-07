@@ -15,11 +15,9 @@ class CustomList():
     def clear(self):
         self.list.clear()
 
-    def addItem(self, listItem, state):
+    def addItem(self, listItem, state = {}):
         type = listItem.type
         text = listItem.text
-        if not type is None:
-            type = type.lower()
         if type is None:
             item = QListWidgetItem(text)
         elif type == 'assign':
@@ -75,42 +73,39 @@ class CustomList():
         else:
             item = QListWidgetItem(self.icons['unknown'], text)
 
-        if not type == 'course' and 'progress' in state.keys():
-            widget = QWidget(self.list)
-            layout = QHBoxLayout(widget)
-            layout.setContentsMargins(0, 0, 0, 0)
-            layout.addStretch()
-            layout.addStrut(0)
+        widget = QWidget(self.list)
+        layout = QHBoxLayout(widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addStretch()
+        layout.addStrut(0)
 
-            label = QLabel()
-            if state['progress'] == 100:
-                icon = self.icons['saved']
-                pm = icon.pixmap(icon.actualSize(QSize(17, 17)))
-            elif state['progress'] == 0:
-                icon = self.icons['unsaved']
-                pm = icon.pixmap(icon.actualSize(QSize(17, 17)))
-            else:
-                icon = self.icons['saved']
-                icon2 = self.icons['unsaved']
-                pm = QPixmap(17,17)
-                pm.fill(Qt.transparent)
-                p1 = icon.pixmap(icon.actualSize(QSize(32,32)))
-                p1 = p1.scaled(QSize(17,17), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                p2 = icon2.pixmap(icon2.actualSize(QSize(32,32)))
-                p2 = p2.scaled(QSize(17,17), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                fill = state['progress']/100
-                r1 = QRect(0,0,17,17)
-                r2 = QRect(0,0,17,17 * (1 - fill))
-                painter = QPainter(pm)
-                painter.drawPixmap(r1, p1, r1)
-                painter.drawPixmap(r2, p2, r2)
-                painter.end()
-
-            label.setPixmap(pm)
-            layout.addWidget(label)
-            widget.setLayout(layout)
-            self.list.addItem(item)
-            self.list.setItemWidget(item, widget)
+        label = QLabel()
+        if listItem['download'] == 100:
+            icon = self.icons['saved']
+            pm = icon.pixmap(icon.actualSize(QSize(17, 17)))
+        elif listItem['download'] == 0:
+            icon = self.icons['unsaved']
+            pm = icon.pixmap(icon.actualSize(QSize(17, 17)))
+            
         else:
-            self.list.addItem(item)
+            icon = self.icons['saved']
+            icon2 = self.icons['unsaved']
+            pm = QPixmap(17,17)
+            pm.fill(Qt.transparent)
+            p1 = icon.pixmap(icon.actualSize(QSize(32,32)))
+            p1 = p1.scaled(QSize(17,17), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            p2 = icon2.pixmap(icon2.actualSize(QSize(32,32)))
+            p2 = p2.scaled(QSize(17,17), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            fill = listItem['download']/100
+            r1 = QRect(0,0,17,17)
+            r2 = QRect(0,0,17,17 * (1 - fill))
+            painter = QPainter(pm)
+            painter.drawPixmap(r1, p1, r1)
+            painter.drawPixmap(r2, p2, r2)
+            painter.end()
 
+        label.setPixmap(pm)
+        layout.addWidget(label)
+        widget.setLayout(layout)
+        self.list.addItem(item)
+        self.list.setItemWidget(item, widget)

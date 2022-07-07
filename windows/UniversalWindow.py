@@ -203,12 +203,12 @@ class UniversalWindow(QWidget):
                 if item.text() == i['text'] and not self.threadState['initFinished'] and self.initiatedSubjects[i['href']] != 100:
                     return
             listItem = DataManager().findByName(item.text())
-            self.generateActivities(listItem)
-            self.mode = 1
+            if self.generateActivities(listItem):
+                self.mode = 1
         elif self.mode == 1:
             listItem = DataManager().findByName(item.text(), self.currentPath)
-            self.generateFiles(listItem)
-            self.mode = 2
+            if self.generateFiles(listItem):
+                self.mode = 2
         self.changeTabs()
 
     def deleteFileClicked(self, item):
@@ -299,35 +299,38 @@ class UniversalWindow(QWidget):
         self.clickedRow = self.ui.list.currentRow()
 
     def generateActivities(self, listItem):
+        activities = DataManager().getActivities(listItem)
+        if len(activities) == 0: return False
         list = CustomList(self.ui.list)
         list.clear()
-        activities = DataManager().getActivities(listItem)
-        if len(activities) == 0: return
         self.ui.label.setText(listItem['text'])
         self.currentPath = [listItem['text']]
         self.mode = 1
         for i in activities:
             try:
-                list.addItem(i, {'progress': i['download']})
+                list.addItem(i)
             except Exception as e:
                 Debugger().throw("UniversalWindow.generateActivities error:\n" + str(e))
                 list.addItem('Error')
                 continue
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
+        return True
 
     def generateFiles(self, listItem):
         if listItem['type'] not in ['assign', 'folder']:
-            return
+            return False
         if len(listItem['files']) == 0 and DataManager().isOnline:
             listItem.set(DataManager().getFiles(listItem))
             if listItem['files'] is None or len(listItem['files']) == 0:
-                return
+                return False
+        elif len(listItem['files']) == 0 and not DataManager().isOnline:
+            return False
         list = CustomList(self.ui.list)
         list.clear()
         for i in listItem['files']:
             try:
-                list.addItem(i, {'progress': i['download']})
+                list.addItem(i)
             except Exception as e:
                 list.addItem('Error')
                 Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))
@@ -336,6 +339,7 @@ class UniversalWindow(QWidget):
         self.currentPath = [self.currentPath[0], listItem.text]
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
+        return True
 
     def changeTabs(self):
         begin = self.ui.beginTab

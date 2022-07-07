@@ -12,7 +12,6 @@ class DataManager():
             cls.session = requests.Session()
             cls.subjects = []
             cls.bufferSubjects = []
-            cls.loadedFiles = []
             cls.username = None
             cls.password = None
             cls.settings = {
@@ -90,8 +89,6 @@ class DataManager():
                 if find is not None:
                     file.downloadProgress = find.downloadProgress
             files.append(file)
-        for i in files:
-            self.loadedFiles.append(i)
         if len(assign.storage) == 0:
             assign.set(files)
         return files
