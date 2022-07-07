@@ -11,7 +11,7 @@ class Debugger:
         return self.__instance
 
     def throw(self, errorStr):
-        logStr = dt.now().strftime('%H:%M:%S ') + errorStr
+        logStr = dt.now().strftime('%H:%M:%S ') + str(errorStr)
         self.logs.append(logStr)
         self.__react()
 

@@ -21,10 +21,17 @@ class FileManager():
             os.makedirs('repository')
 
         return cls.__instance
+    
+    def mergeSubjects(self):
+        current = DataManager().getSubjects()
+        previous = DataManager().bufferSubjects
+        merged = [ListFile.Merge(current[i], previous[i]) for i in range(len(current))]
+        return merged
+
 
     def saveSubjects(self):
         #DataManager().initiateData()
-        jsonString = json.dumps([i.toDict() for i in DataManager().getSubjects()], ensure_ascii=False)
+        jsonString = json.dumps([i.toDict() for i in self.mergeSubjects()], ensure_ascii=False)
         with open('data/subjects.json', 'w', encoding = 'utf-8') as file:
             file.write(jsonString)
 

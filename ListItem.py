@@ -94,6 +94,42 @@ class ListItem:
                     return find
         return None
 
+    @staticmethod
+    def StorageDepth(item):
+        if item.Signature == 'file' or len(item.storage) == 0:
+            return 0
+        summ = 0
+        for i in item.storage:
+            summ += ListItem.StorageDepth(i)
+        return len(item.storage) + summ
+
+    @staticmethod
+    def Merge(primary, secondary):
+        if primary.href != secondary.href: return primary
+        if primary.Signature == 'file':
+            return primary
+        if primary.Signature == 'storage':
+            if len(primary.storage) == 0 and len(secondary.storage) == 0: return primary
+            if len(primary.storage) == 0:
+                return secondary
+            elif len(secondary.storage) == 0:
+                return primary
+            else:
+                store = [ListItem.Merge(primary.storage[i], secondary.storage[i]) for i in range(len(primary.storage))]
+                primary.set(store)
+                return primary
+
+    @staticmethod
+    def GetFiles(item, itemsList):
+        if item.Signature == 'file':
+            itemsList.append(item)
+        else:
+            for i in item.store:
+                itemsList.append(ListItem.GetFiles(i, itemsList))
+        
+
+          
+
 
 class ListFile(ListItem):
     Signature = 'file'
@@ -169,3 +205,5 @@ class ListStorage(ListItem):
         dict['download'] = self._downloadProgress
         dict['storage'] = [i.toDict() for i in self.storage]
         return dict
+
+        
