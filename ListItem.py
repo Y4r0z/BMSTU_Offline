@@ -1,6 +1,5 @@
 
 class ListItem:
-
     def __init__(self, text='item_text', type='item_type', href='item_href', progress=0):
         self._text = text
         self._type = type
@@ -53,7 +52,6 @@ class ListItem:
     def __getitem__(self, key):
         return self.getProperty(key)
 
-
     def contextAction(self):
         raise NotImplementedError("Context action is not implemented!")
 
@@ -67,7 +65,7 @@ class ListItem:
         return self._text
 
     @staticmethod
-    def FromDict(self, dict):
+    def FromDict(dict):
         item = None
         text = dict['text']
         type = dict['type']
@@ -78,13 +76,25 @@ class ListItem:
             item.path = dict['path']
         else:
             item = ListStorage(text, type, href)
-            item.set(dict['storage'])
+            item.set([ListItem.FromDict(i) for i in dict['storage']])
         item.downloadProgress = download
         return item
+    
+    @staticmethod
+    def FindByHref(href, item):
+        if item.href == href:
+            return item
+        if item.Signature == 'storage':
+            for i in item.storage:
+                find = ListItem.FindByHref(href, i)
+                if find and find.href == href:
+                    return find
+        return None
 
 
 class ListFile(ListItem):
     Signature = 'file'
+
     def __init__(self, text, type, href, progress=0):
         super().__init__(text, type, href, progress)
         self._path = []

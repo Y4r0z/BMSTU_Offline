@@ -7,8 +7,10 @@ import requests
 import subprocess
 from IconsManager import IconsManager
 from Debugger import Debugger
+from ListItem import ListFile, ListStorage
 class FileManager():
     __instance = None
+
     def __new__(cls):
         if cls.__instance is None:
             cls.__instance = super(FileManager, cls).__new__(cls)
@@ -22,16 +24,15 @@ class FileManager():
 
     def saveSubjects(self):
         #DataManager().initiateData()
-        subjects = DataManager().getSubjects()
         jsonString = json.dumps([i.toDict() for i in DataManager().getSubjects()], ensure_ascii=False)
         with open('data/subjects.json', 'w', encoding = 'utf-8') as file:
             file.write(jsonString)
 
     def loadSubjects(self):
         try:
-            with open ('data/subjects.json', 'r', encoding = 'utf-8') as file:
+            with open('data/subjects.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
-                DataManager().setSubjects(data)
+                DataManager().setSubjects([ListFile.FromDict(i) for i in data])
             return True
         except:
             Debugger().throw('Cant open "data/subjects.json"!')
@@ -40,20 +41,20 @@ class FileManager():
     def getIcons(self):
         return self._icons
 
-    def saveUser(self, login = None, password = None):
+    def saveUser(self, login=None, password=None):
         if login is None or password is None:
             login = DataManager().username
             password = DataManager().password
             if login is None or password is None:
                 return False
-        jsonString = json.dumps([{'login':login,'password':password}],ensure_ascii = False)
-        with open('data/user.json', 'w', encoding = 'utf-8') as file:
+        jsonString = json.dumps([{'login':login, 'password':password}], ensure_ascii = False)
+        with open('data/user.json', 'w', encoding='utf-8') as file:
             file.write(jsonString)
         return True
 
     def loadUser(self):
         try:
-            with open ('data/user.json', 'r', encoding = 'utf-8') as file:
+            with open('data/user.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 DataManager().setUser(data[0]['login'], data[0]['password'])
             return True
@@ -61,16 +62,16 @@ class FileManager():
             Debugger().throw('Cant open data/user.json\n' + str(e))
             return False
 
-    def saveSettings(self, settings = None):
+    def saveSettings(self, settings=None):
         if settings is None:
             settings = DataManager().getSettings()
-        jsonString = json.dumps(settings, ensure_ascii = False)
-        with open ('data/settings.json', 'w', encoding = 'utf-8') as file:
+        jsonString = json.dumps(settings, ensure_ascii=False)
+        with open('data/settings.json', 'w', encoding='utf-8') as file:
             file.write(jsonString)
 
     def loadSettings(self):
         try:
-            with open ('data/settings.json', 'r', encoding = 'utf-8') as file:
+            with open('data/settings.json', 'r', encoding='utf-8') as file:
                 data = json.load(file)
                 DataManager().setSettings(data)
             return True
@@ -106,12 +107,12 @@ class FileManager():
             return False
 
     def openFile(self, file):
-        if not DataManager().isDownloaded(file['href']):
+        if file['download'] < 100:
             return False
         path = DataManager().listToPath(file.path)
         if sys.platform.startswith('win'):
-            subprocess.Popen(path, shell = True)
-        else: #Linux костыл
+            subprocess.Popen(path, shell=True)
+        else: #Linux костыль
             myEnv = dict(os.environ)
             lp_key = 'LD_LIBRARY_PATH'
             lp_orig = myEnv.get(lp_key + '_ORIG')

@@ -86,6 +86,7 @@ class AuthWindow(QMainWindow):
     def authOnlineSuccess(self):
         DataManager().isOnline = True
         FileManager().loadSettings()
+        FileManager().loadSubjects()
         if self.ui.rememberMe.isChecked():
             login = self.ui.loginEdit.text()
             password = self.ui.passwordEdit.text()

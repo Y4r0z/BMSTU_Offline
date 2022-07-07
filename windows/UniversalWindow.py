@@ -32,7 +32,6 @@ class UniversalWindow(QWidget):
         self.currentPath = []
         self.styles = {}
         self.isFilterSaved = True
-
         self.threads = []
         self.threadState = {'downloadFinished': True, 'initFinished': True}
         self.initiatedSubjects = {}

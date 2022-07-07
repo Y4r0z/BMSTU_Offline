@@ -11,6 +11,7 @@ class DataManager():
             cls.__instance = super(DataManager, cls).__new__(cls)
             cls.session = requests.Session()
             cls.subjects = []
+            cls.bufferSubjects = []
             cls.loadedFiles = []
             cls.username = None
             cls.password = None
@@ -37,7 +38,12 @@ class DataManager():
             rawSubjects = getSubjects(self.session, self.loginResult)
             subjects = []
             for i in rawSubjects:
-                subjects.append(ListStorage(i['text'], 'course', i['href']))
+                subject = ListStorage(i['text'], 'course', i['href'])
+                for i in self.bufferSubjects:
+                    find = ListFile.FindByHref(subject.href, i)
+                    if find is not None:
+                        subject.downloadProgress = find.downloadProgress
+                subjects.append(subject)
             self.subjects = subjects
         except Exception as e:
             Debugger().throw("getSubjects() error:\n" + str(e))
@@ -57,6 +63,10 @@ class DataManager():
                     activity = ListFile(i['text'], i['type'], i['href'])
                     activity.parent = subject
                     activity.path = self.generateFilePathList(activity)
+                for i in self.bufferSubjects:
+                    find = ListFile.FindByHref(activity.href, i)
+                    if find is not None:
+                        activity.downloadProgress = find.downloadProgress
                 activities.append(activity)
             if len(subject.storage) == 0:
                 subject.set(activities)
@@ -75,6 +85,10 @@ class DataManager():
             file = ListFile(i['text'], i['type'], i['href'])
             file.parent = assign
             file.path = self.generateFilePathList(file)
+            for i in self.bufferSubjects:
+                find = ListFile.FindByHref(file.href, i)
+                if find is not None:
+                    file.downloadProgress = find.downloadProgress
             files.append(file)
         for i in files:
             self.loadedFiles.append(i)
@@ -100,7 +114,10 @@ class DataManager():
 
     def setSubjects(self, data):
         if len(self.subjects) == 0:
-            self.subjects = data
+            if self.isOnline:
+                self.bufferSubjects = data
+            else:
+                self.subjects = data
         else:
             Debugger().throw("DataManaget().setSubjects(data): self.subjects isn't empty")
 
