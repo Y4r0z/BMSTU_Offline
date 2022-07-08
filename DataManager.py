@@ -208,11 +208,11 @@ class DataManager():
                     if k['text'] == text:
                         return k
 
-    def find(self, herf):
+    def find(self, href):
         for i in self.getSubjects():
             found = ListFile.FindByHref(href, i)
-            if i is not None:
-                return i
+            if found is not None:
+                return found
 
                 
 

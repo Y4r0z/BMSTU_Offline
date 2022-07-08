@@ -6,7 +6,6 @@ class ListItem:
         self._href = href
         self._downloadProgress = progress
         self.parent = None
-        self.signature = None
         #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
@@ -41,6 +40,12 @@ class ListItem:
             new = 100
         self._downloadProgress = new
         self._properties[('state', 'download', 'downloadState', 'downloadProgress')] = self._downloadProgress
+        if self.parent is not None and len(self.parent.storage) > 0:
+            n = len(self.parent.storage)
+            k = 0
+            for i in self.parent.storage:
+                k += i.downloadProgress
+            self.parent.downloadProgress = (k/n)*100
 
     def getProperty(self, key):
         ret = None
@@ -52,21 +57,9 @@ class ListItem:
     def __getitem__(self, key):
         return self.getProperty(key)
 
-    def contextAction(self):
-        raise NotImplementedError("Context action is not implemented!")
-
-    def onClickAction(self):
-        raise NotImplementedError("Click action is not implemented!")
-
-    def toDict(self):
-        raise NotImplementedError("Dictionary transformation is not implemented!")
-
     def __str__(self):
         return self._text
 
-    #
-    # Добавить родителя в .parent
-    #
     @staticmethod
     def FromDict(dict):
         item = None
@@ -79,7 +72,12 @@ class ListItem:
             item.path = dict['path']
         else:
             item = ListStorage(text, type, href)
-            item.set([ListItem.FromDict(i) for i in dict['storage']])
+            items = []
+            for i in dict['storage']:
+                tmp = ListItem.FromDict(i)
+                tmp.parent = item
+                items.append(tmp)
+            item.set(items)
         item.downloadProgress = download
         return item
     
@@ -138,7 +136,6 @@ class ListFile(ListItem):
     def __init__(self, text, type, href, progress=0):
         super().__init__(text, type, href, progress)
         self._path = []
-        self.signature = self.Signature
         self._properties[('path')] = self._path
 
     @property
@@ -172,7 +169,6 @@ class ListStorage(ListItem):
         super().__init__(text, type, href, progress)
         if storage is None: self.storage = []
         else: self.storage = storage
-        self.signature = self.Signature
         self._properties[('files', 'activities')] = self.storage
 
     def add(self, item):

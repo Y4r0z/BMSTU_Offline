@@ -25,6 +25,8 @@ class FileManager():
     def mergeSubjects(self):
         current = DataManager().getSubjects()
         previous = DataManager().bufferSubjects
+        if len(current) != len(previous):
+            return current
         merged = [ListFile.Merge(current[i], previous[i]) for i in range(len(current))]
         return merged
 
@@ -100,14 +102,6 @@ class FileManager():
             with open(fullPath, 'wb') as f:
                 f.write(DataManager().getDownloadData(file))
             file.downloadProgress = 100
-            parent = file.parent
-            if parent is not None:
-                cnt = len(parent['files'])
-                n = 0
-                for f in parent['files']:
-                    if f['download'] > 0:
-                        n += 1
-                parent.downloadProgress = n/cnt*100
             return True
         except Exception as e:
             Debugger().throw('Cant download file\n' + str(e))
@@ -129,7 +123,10 @@ class FileManager():
                 lp = myEnv.get(lp_key)
                 if lp is not None:
                     myEnv.pop(lp_key)
-            subprocess.Popen(["xdg-open", path], env=myEnv)
+            try:
+                subprocess.Popen(["xdg-open", path], env=myEnv)
+            except Exception as e:
+                Debugger().throw("FM.openFIle can't open file: " + str(e))
         return True
 
     def deleteFile(self, file):
@@ -140,17 +137,10 @@ class FileManager():
             Debugger().throw('File does not exists: ' + path)
         file.downloadProgress = 0
         parent = file.parent
-        if parent is not None:
-            cnt = len(parent['files'])
-            n = 0
-            for f in parent['files']:
-                if f['download'] > 0:
-                    n+=1
-            if n != 0:
-                parent.downloadProgress = n/cnt*100
-            else:
-                parent.downloadProgress = 0
-        os.remove(path)
+        try:
+            os.remove(path)
+        except Exception as e:
+            Debugger().throw("FM.deleteFile() can't os.remove: " + str(e))
         return True
 
 

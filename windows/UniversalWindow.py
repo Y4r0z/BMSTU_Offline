@@ -123,7 +123,7 @@ class UniversalWindow(QWidget):
             item = source.itemAt(event.pos())
             if item is None:
                 return
-            obj = DataManager().findByName(item.text(), self.currentPath)
+            obj = listItem = DataManager().find(str(item.data(Qt.UserRole)))
             menu.addAction(icons['open'], 'Открыть')
             if obj.Signature == 'file':
                 if obj['download'] == 0 and DataManager().isOnline:
@@ -144,7 +144,7 @@ class UniversalWindow(QWidget):
                 if text == 'Скачать':
                     self.downloadAll(obj)
                 elif text == 'Удалить':
-                    self.deleteFile(item)
+                    self.deleteFile(obj)
                 elif text == 'Скачать всё':
                     self.downloadAll(obj)
                 elif text == 'Удалить всё':
@@ -194,17 +194,16 @@ class UniversalWindow(QWidget):
 
 
     def openClicked(self, item):
-        if self.mode != 0 and self.tryOpenFile(item.text()):
+        listItem = listItem = DataManager().find(str(item.data(Qt.UserRole)))
+        if self.mode != 0 and self.tryOpenFile(listItem):
             return
         if self.mode == 0:
             for i in DataManager().getSubjects():
                 if item.text() == i['text'] and not self.threadState['initFinished'] and self.initiatedSubjects[i['href']] != 100:
                     return
-            listItem = DataManager().findByName(item.text())
             if self.generateActivities(listItem):
                 self.mode = 1
         elif self.mode == 1:
-            listItem = DataManager().findByName(item.text(), self.currentPath)
             if self.generateFiles(listItem):
                 self.mode = 2
         self.changeTabs()
@@ -224,16 +223,13 @@ class UniversalWindow(QWidget):
         if item.Signature == 'file':
             self.deleteFile(item)
             return
+        self.loadItem(item)
         files = []
         ListFile.GetFiles(item, files)
         for i in files:
             self.deleteAll(i)
-    
-
         
-
-    def tryOpenFile(self, text):
-        file = DataManager().findByName(text, self.currentPath)
+    def tryOpenFile(self, file):
         if file is None or file['type'] in ListStorage.Types:
             return False
         if file['download'] == 100:
@@ -372,7 +368,7 @@ class UniversalWindow(QWidget):
             begin.setStyleSheet(self.styles['beginTab'] + \
             'QPushButton{' + inactive2 + 'QPushButton::hover{' + active)
             assign.setText(self.currentPath[1])
-            assign.resize(len(assign.text()) * 8, assign.height())
+            assign.resize(20 + len(assign.text()) * 8, assign.height())
             self.ui.filterEdit.setEnabled(False)
             self.ui.saveFilterButton.setEnabled(False)
             assign.show()
