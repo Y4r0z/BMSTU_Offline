@@ -39,10 +39,22 @@ class Timer:
     def __init__(self):
         self.timer = 0
         self.log = []
+        self.waypoints = 0
     
     def start(self):
         self.timer = time.time()
+        self.waypoints = 0
     
+    def clk(self, name = None):
+        result = round((time.time() - self.timer)*1000,2)
+        self.log.append(result)
+        if name is None:
+            Debugger().throw("Timer clk(" + str(self.waypoints) + "): " + str(result) + " ms.")
+        else:
+            Debugger().throw("Timer clk(" + name + "): " + str(result) + " ms.")
+        self.timer = time.time()
+        self.waypoints+=1
+
     def stop(self):
         result = round((time.time() - self.timer)*1000,2)
         self.log.append(result)

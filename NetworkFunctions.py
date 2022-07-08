@@ -100,6 +100,7 @@ def getSubjects(session, loginResult):
 
 
 def getActivities(session, s):
+    Debugger().timer.start()
     if len(s['activities']) > 0:
         return s['activities']
     with session.get(s['href']) as coursePage:
@@ -130,27 +131,27 @@ def getActivities(session, s):
                 if type == 'resource':
                     source = activity.xpath('img')[0].get('src')
                     type = source.split('/')[-1].split('-')[0]
-                    downloadLink = session.get(activityLink, allow_redirects=False)
-                    tree2 = lxml.html.fromstring(downloadLink.text)
-                    if type == 'mp3':
-                        t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
-                        tempHref = t[0].get('src')
-                        type = tempHref.split('/')[-1].split('.')[-1]
-                        activityLink = tempHref
-                        text += ' аудио'
-                    else:
-                        t = tree2.xpath('//*[@id="region-main"]/div/a')
-                        if len(t) == 0:
-                            Debugger().throw("Undefined activity type!")
-                            continue
-                        tempHref = t[0].get('href')
-                        type = tempHref.split('.')[-1].split('?')[0]
-                elif type == 'folder':
-                    pass
+                    if type != 'pdf':
+                        downloadLink = session.get(activityLink, allow_redirects=False)
+                        tree2 = lxml.html.fromstring(downloadLink.text)
+                        if type == 'mp3':
+                            t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
+                            tempHref = t[0].get('src')
+                            type = tempHref.split('/')[-1].split('.')[-1]
+                            activityLink = tempHref
+                            text += ' аудио'
+                        else:
+                            t = tree2.xpath('//*[@id="region-main"]/div/a')
+                            if len(t) == 0:
+                                Debugger().throw("Undefined activity type!")
+                                continue
+                            tempHref = t[0].get('href')
+                            type = tempHref.split('.')[-1].split('?')[0]
                 files = None
                 if type in ['assign', 'folder']:
                     files = []
                 activities.append({'text': text, 'type': type, 'href': activityLink, 'files': files, 'parent': s['href']})
             except Exception as e:
                 Debugger().throw("getActivites(). Some acts was passed because of:\n" + str(e))
+    Debugger().timer.clk('End')
     return activities
