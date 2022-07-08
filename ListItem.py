@@ -123,9 +123,10 @@ class ListItem:
     def GetFiles(item, itemsList):
         if item.Signature == 'file':
             itemsList.append(item)
+            return
         else:
-            for i in item.store:
-                itemsList.append(ListItem.GetFiles(i, itemsList))
+            for i in item['files']:
+                ListItem.GetFiles(i, itemsList)
         
 
           
@@ -151,12 +152,6 @@ class ListFile(ListItem):
             return
         for i in new:
             self._path.append(i)
-
-    def contextAction(self):
-        pass
-
-    def onClickAction(self):
-        pass
 
     def toDict(self):
         dict = {}
@@ -190,11 +185,6 @@ class ListStorage(ListItem):
         for i in lst:
             self.storage.append(i)
 
-    def contextAction(self):
-        pass
-
-    def onClickAction(self):
-        pass
 
     def toDict(self):
         dict = {}

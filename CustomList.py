@@ -107,5 +107,7 @@ class CustomList():
         label.setPixmap(pm)
         layout.addWidget(label)
         widget.setLayout(layout)
+        #Href теперь храниться в элементе списка
+        item.setData(Qt.UserRole, str(listItem.href))
         self.list.addItem(item)
         self.list.setItemWidget(item, widget)
