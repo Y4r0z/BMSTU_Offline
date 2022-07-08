@@ -33,8 +33,6 @@ class UniversalWindow(QWidget):
         self.styles = {}
         self.isFilterSaved = True
         self.threads = []
-        self.threadState = {'downloadFinished': True, 'initFinished': True}
-        self.initiatedSubjects = {}
 
         self.settingsWindow = SettingsWindow(self)
 
@@ -49,7 +47,7 @@ class UniversalWindow(QWidget):
         self.setLayout(self.ui.layout())
         self.setGeometry(self.ui.geometry())
         self.setWindowTitle('BMSTU Offline')
-        self.setWindowIcon(FileManager().getIcons()['bmstu'])
+        self.setWindowIcon(FileManager().getIcons()['bmstu_small'])
         ui_file.close()
 
     def loadWidgets(self):
@@ -167,8 +165,6 @@ class UniversalWindow(QWidget):
         self.openClicked(item)
 
     def listItemClicked(self, item):
-        if self.mode != 0 or self.threadState['initFinished'] == True:
-            return
         if self.clickedRow == self.ui.list.currentRow():
             self.openClicked(item)
         self.clickedRow = self.ui.list.currentRow()
@@ -199,7 +195,7 @@ class UniversalWindow(QWidget):
             return
         if self.mode == 0:
             for i in DataManager().getSubjects():
-                if item.text() == i['text'] and not self.threadState['initFinished'] and self.initiatedSubjects[i['href']] != 100:
+                if item.text() == i['text']:
                     return
             if self.generateActivities(listItem):
                 self.mode = 1
@@ -260,12 +256,6 @@ class UniversalWindow(QWidget):
         cList.clear()
         subjects = DataManager().getSubjects()
         self.ui.label.setText('Мои курсы')
-        state = {}
-        if not self.threadState['initFinished']:
-            state = self.initiatedSubjects
-        else:
-            for i in subjects:
-                state[i['href']] = None
         if filter is None:        
             for i in subjects:
                 cList.addItem(i, {'courseState':state[i['href']]})
@@ -397,30 +387,7 @@ class UniversalWindow(QWidget):
             return
         item = DownloadItem(file)
         item.complete.connect(self.refresh)
-        Downloader().push(item)
-  
-    def initiateSubjects(self):
-        if self.threadState['downloadFinished'] and self.threadState['initFinished']:
-            self.ui.list.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-            self.settingsWindow.ui.saveSubjects.hide()
-            self.threadState['initFinished'] = False
-            self.threads.append(InitSubjectsThread(self.initiatedSubjects))
-            self.threads[-1].finished.connect(self.finishInitSubjects)
-            self.threads[-1].clk.connect(self.clkInitSubjects)
-            self.threads[-1].start()
-            return
-
-
-    def clkInitSubjects(self, progress):
-        self.refresh()
-
-    def finishInitSubjects(self):
-        if self.threadState['initFinished']:
-            return
-        self.ui.list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.threadState['initFinished'] = True
-        self.settingsWindow.ui.saveSubjects.show()
-        FileManager().saveSubjects()
+        Downloader().push(item)  
     
     def loadItem(self, item):
         if self.mode == 0:

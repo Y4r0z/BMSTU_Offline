@@ -8,6 +8,7 @@ class Debugger:
     def __new__(self):
         if self.__instance is None:
             self.__instance = super(Debugger,self).__new__(self)
+            self.timer = Timer()
         return self.__instance
 
     def throw(self, errorStr):
@@ -32,6 +33,24 @@ class Debugger:
 
     def wait(self, waitTime):
         time.sleep(waitTime/1000)
+
+
+class Timer:
+    def __init__(self):
+        self.timer = 0
+        self.log = []
+    
+    def start(self):
+        self.timer = time.time()
+    
+    def stop(self):
+        result = round((time.time() - self.timer)*1000,2)
+        self.log.append(result)
+        Debugger().throw("Timer: " + str(result) + " ms.")
+    
+    def printLog(self):
+        for i in self.log:
+            print("Timer: " + str(i) + " ms.")
 
 
 

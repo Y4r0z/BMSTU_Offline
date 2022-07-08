@@ -3,7 +3,6 @@ from PySide6.QtCore import QThread, Signal, QMutex, QObject
 from Debugger import Debugger
 from FileManager import FileManager
 
-
 class DownloadItem(QObject):
     complete = Signal()
     def __init__(self, file):
