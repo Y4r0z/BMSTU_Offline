@@ -8,9 +8,11 @@ class DownloadItem(QObject):
     def __init__(self, file):
         super().__init__()
         self.file = file
+        file.locked = True
 
     def execute(self):
         FileManager().downloadFile(self.file)
+        self.file.locked = False
         self.complete.emit()
 
 

@@ -2,7 +2,7 @@ from DataManager import DataManager
 from FileManager import FileManager
 from PySide6 import QtCore
 from PySide6.QtCore import QThread, Signal, QMutex
-
+from ListItem import ListFile, ListStorage, ListItem
 class LoginThread(QThread):
     complete = Signal(bool)
 
@@ -17,21 +17,28 @@ class LoginThread(QThread):
         else:
             self.complete.emit(False)
 
-downloadMutex = QMutex()
-class downloadFileThread(QThread):
-    def __init__(self, name, path):
+
+class InitItemThread(QThread):
+    complete = Signal(ListItem)
+    def __init__(self, item, listMode):
         super().__init__()
-        self.name = name
-        self.path = path
-        self.isRunning = True
-
+        self.item = item
+        self.mode = listMode
+    
     def run(self):
-        while True:
-            if downloadMutex.tryLock():
-                FileManager().downloadFile(self.name, self.path)
-                downloadMutex.unlock()
-                self.isRunning = False
-                break
-            QThread.msleep(10)
-
-
+        self.item.locked = True
+        if self.mode == 0:
+            item = self.item
+            activities = []
+            if len(item['files']) == 0:
+                activities = DataManager().getActivities(item)
+            if len(item['files']) == 0: return
+            activities = item['files']
+            for i in activities:
+                if i.Signature == 'file': continue
+                if len(i['files']) == 0:
+                    files = DataManager().getFiles(i)
+        elif self.mode == 1:
+            DataManager().getFiles(item)
+        self.item.locked = False
+        self.complete.emit(self.item)

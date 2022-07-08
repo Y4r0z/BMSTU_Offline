@@ -103,11 +103,16 @@ class CustomList():
             painter.drawPixmap(r1, p1, r1)
             painter.drawPixmap(r2, p2, r2)
             painter.end()
-
+        if listItem.locked:
+            label2 = QLabel()
+            icon = self.icons['lock']
+            label2.setPixmap(icon.pixmap(icon.actualSize(QSize(17, 17))))
+            layout.addWidget(label2)
         label.setPixmap(pm)
         layout.addWidget(label)
         widget.setLayout(layout)
         #Href теперь храниться в элементе списка
         item.setData(Qt.UserRole, str(listItem.href))
+
         self.list.addItem(item)
         self.list.setItemWidget(item, widget)

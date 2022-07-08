@@ -11,7 +11,7 @@ from pathlib import Path
 from FileManager import FileManager
 from DataManager import DataManager
 from CustomList import CustomList
-from Threads import *
+from Threads import InitItemThread
 from windows.settingsWindow import SettingsWindow
 from Debugger import Debugger
 from Downloader import Downloader, DownloadItem
@@ -32,11 +32,7 @@ class UniversalWindow(QWidget):
         self.currentPath = []
         self.styles = {}
         self.isFilterSaved = True
-        self.threads = []
-
         self.settingsWindow = SettingsWindow(self)
-
-        self.clickedRow = -1
 
     def load_ui(self):
         loader = QUiLoader()
@@ -66,7 +62,6 @@ class UniversalWindow(QWidget):
         self.ui.list.installEventFilter(self)
         self.ui.filterEdit.textChanged.connect(self.filterChanged)
         self.ui.list.itemDoubleClicked.connect(self.listItemDoubleClicked)
-        self.ui.list.itemPressed.connect(self.listItemClicked)
         self.ui.beginTab.clicked.connect(self.beginTabClicked)
         self.ui.courseTab.clicked.connect(self.courseTabClicked)
         self.ui.saveFilterButton.clicked.connect(self.saveFilter)
@@ -122,6 +117,8 @@ class UniversalWindow(QWidget):
             if item is None:
                 return
             obj = listItem = DataManager().find(str(item.data(Qt.UserRole)))
+            if obj.locked:
+                return
             menu.addAction(icons['open'], 'Открыть')
             if obj.Signature == 'file':
                 if obj['download'] == 0 and DataManager().isOnline:
@@ -133,7 +130,6 @@ class UniversalWindow(QWidget):
                     menu.addAction(icons['download'], 'Скачать всё')
                 if obj['download'] > 0:
                     menu.addAction(icons['delete'], 'Удалить всё')
-
             action = menu.exec(event.globalPos())
             if action:
                 text = action.text()
@@ -164,11 +160,6 @@ class UniversalWindow(QWidget):
     def listItemDoubleClicked(self, item):
         self.openClicked(item)
 
-    def listItemClicked(self, item):
-        if self.clickedRow == self.ui.list.currentRow():
-            self.openClicked(item)
-        self.clickedRow = self.ui.list.currentRow()
-
 
     def beginTabClicked(self):
         if self.mode == 0:
@@ -190,13 +181,12 @@ class UniversalWindow(QWidget):
 
 
     def openClicked(self, item):
-        listItem = listItem = DataManager().find(str(item.data(Qt.UserRole)))
+        listItem = DataManager().find(str(item.data(Qt.UserRole)))
+        if listItem.locked:
+            return
         if self.mode != 0 and self.tryOpenFile(listItem):
             return
         if self.mode == 0:
-            for i in DataManager().getSubjects():
-                if item.text() == i['text']:
-                    return
             if self.generateActivities(listItem):
                 self.mode = 1
         elif self.mode == 1:
@@ -219,11 +209,21 @@ class UniversalWindow(QWidget):
         if item.Signature == 'file':
             self.deleteFile(item)
             return
-        self.loadItem(item)
+        if DataManager().isOnline:
+            self.thread = InitItemThread(item, self.mode)
+            self.thread.complete.connect(self.deleteAllThreaded)
+            self.thread.start()
+            self.refresh()
         files = []
         ListFile.GetFiles(item, files)
         for i in files:
             self.deleteAll(i)
+    def deleteAllThreaded(self, item):
+        files = []
+        ListFile.GetFiles(item, files)
+        for i in files:
+            self.deleteAll(i)
+        self.refresh()
         
     def tryOpenFile(self, file):
         if file is None or file['type'] in ListStorage.Types:
@@ -240,11 +240,24 @@ class UniversalWindow(QWidget):
         if item.Signature == 'file':
             self.downloadFile(item)
             return
-        self.loadItem(item)
+        if DataManager().isOnline:
+            self.thread = InitItemThread(item, self.mode)
+            self.thread.complete.connect(self.downloadAllThreaded)
+            self.thread.start()
+            self.refresh()
+            return
         files = []
         ListFile.GetFiles(item, files)
         for i in files:
             self.downloadAll(i)
+    def downloadAllThreaded(self, item):
+        files = []
+        ListFile.GetFiles(item, files)
+        for i in files:
+            self.downloadAll(i)
+        self.refresh()
+        
+
 
     def settingsButtonClicked(self):
         self.settingsWindow.show()
@@ -258,14 +271,14 @@ class UniversalWindow(QWidget):
         self.ui.label.setText('Мои курсы')
         if filter is None:        
             for i in subjects:
-                cList.addItem(i, {'courseState':state[i['href']]})
+                cList.addItem(i)
         else:
             CyrillicTranslateAlphabet = dict(zip(list("qwertyuiop[]asdfghjkl;'zxcvbnm,."), list('йцукенгшщзхъфывапролджэячсмитьбю')))
             find = False
             for i in subjects:
                 if i['text'].lower().find(filter) != -1:
                     find = True
-                    cList.addItem(i, {'courseState':state[i['href']]})
+                    cList.addItem(i)
             if not find:
                 text = []
                 for i in filter:
@@ -275,13 +288,12 @@ class UniversalWindow(QWidget):
                         text.append(i)
                 for i in subjects:
                     if i['text'].lower().find(''.join(text)) != -1:
-                        cList.addItem(i, {'courseState':state[i['href']]})
+                        cList.addItem(i)
         if self.ui.list.count() > 0:
             if size == self.ui.list.count():
                 self.ui.list.setCurrentRow(row)
             else:
                 self.ui.list.setCurrentRow(0)
-        self.clickedRow = self.ui.list.currentRow()
 
     def generateActivities(self, listItem):
         activities = DataManager().getActivities(listItem)
@@ -389,23 +401,6 @@ class UniversalWindow(QWidget):
         item.complete.connect(self.refresh)
         Downloader().push(item)  
     
-    def loadItem(self, item):
-        if self.mode == 0:
-            activities = []
-            if len(item['files']) == 0:
-                activities = DataManager().getActivities(item)
-            if len(item['files']) == 0: return
-            activities = item['files']
-            for i in activities:
-                if i.Signature == 'file': continue
-                if len(i['files']) == 0:
-                    files = DataManager().getFiles(i)
-        elif self.mode == 1:
-            DataManager().getFiles(item)
-
-
-
-
 
 
 

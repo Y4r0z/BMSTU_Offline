@@ -58,5 +58,6 @@ class IconsManager:
         self.__add('courseSemiSaved', 'icons/courseSemiSaved.png')
         self.__add('courseUnsaved', 'icons/courseUnsaved.png')
         self.__add('bmstu_small', 'icons/BMSTU_cut.png')
+        self.__add('lock', 'icons/lock.png')
 
 

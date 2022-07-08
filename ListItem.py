@@ -6,6 +6,7 @@ class ListItem:
         self._href = href
         self._downloadProgress = progress
         self.parent = None
+        self._locked = False
         #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
@@ -13,7 +14,8 @@ class ListItem:
         ('type'): self._type,
         ('href', 'link'): self._href,
         ('state', 'download', 'downloadState', 'downloadProgress'): self._downloadProgress,
-        ('parent'): self.parent
+        ('parent'): self.parent,
+        ('lock', 'locked'): self._locked
         }
 
     @property
@@ -27,6 +29,13 @@ class ListItem:
     @property
     def href(self):
         return self._href
+    
+    @property
+    def locked(self):
+        return self._locked
+    @locked.setter
+    def locked(self, new):
+        self._locked = new
 
     @property #0.0 - 100.0
     def downloadProgress(self):
@@ -45,7 +54,7 @@ class ListItem:
             k = 0
             for i in self.parent.storage:
                 k += i.downloadProgress
-            self.parent.downloadProgress = (k/n)*100
+            self.parent.downloadProgress = (k/n)
 
     def getProperty(self, key):
         ret = None
