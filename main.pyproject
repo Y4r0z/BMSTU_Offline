@@ -1,3 +1,0 @@
-{
-    "files": ["Downloader.py","CustomList.py","windows/UniversalForm.ui","windows/SplashScreenForm.ui","windows/settingsWindow.py","DataManager.py","UniversalWindow.py","windows/AuthWindow.py","windows/SettingsForm.ui","SettingsForm.ui","ListItem.py","SettingsWindow.py","windows/SplashScreen.py","Threads.py","windows/AuthForm.ui","SplashScreen.py","SplashScreenForm.ui","windows/UniversalWindow.py","Debugger.py","NetworkFunctions.py","AuthWindow.py","UniversalForm.ui","AuthForm.ui","IconsManager.py","main.py","FileManager.py"]
-}

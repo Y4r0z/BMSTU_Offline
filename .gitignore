@@ -21,3 +21,5 @@ main.pyproject
 
 main.pyproject.user
 
+
+*.pyproject
