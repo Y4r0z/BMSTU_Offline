@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem, QPushButton, QHBoxLa
 from PySide6.QtGui import QIcon, QPainter, QPixmap
 from PySide6.QtCore import QSize, Qt, QRect
 from FileManager import FileManager
-
+from DataManager import DataManager
 
 
 class CustomList():
@@ -14,6 +14,18 @@ class CustomList():
 
     def clear(self):
         self.list.clear()
+
+    def update(self):
+        subjects = DataManager().getSubjects()
+        for i in range(self.list.count()):
+            item = self.list.item(i)
+            find = DataManager().find(str(item.data(Qt.UserRole)))
+            if find is None:
+                continue
+            self.list.removeItemWidget(item)
+            self.setWidget(item, find)
+
+
 
     def addItem(self, listItem, state = {}):
         type = listItem.type
@@ -72,7 +84,12 @@ class CustomList():
             item = QListWidgetItem(self.icons['audio'], text)
         else:
             item = QListWidgetItem(self.icons['unknown'], text)
-
+        #Href теперь храниться в элементе списка5
+        item.setData(Qt.UserRole, str(listItem.href))
+        self.list.addItem(item)
+        self.setWidget(item, listItem)
+    
+    def setWidget(self, item, listItem):
         widget = QWidget(self.list)
         layout = QHBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -111,8 +128,4 @@ class CustomList():
         label.setPixmap(pm)
         layout.addWidget(label)
         widget.setLayout(layout)
-        #Href теперь храниться в элементе списка
-        item.setData(Qt.UserRole, str(listItem.href))
-
-        self.list.addItem(item)
         self.list.setItemWidget(item, widget)

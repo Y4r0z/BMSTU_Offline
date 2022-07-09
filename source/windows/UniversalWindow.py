@@ -75,11 +75,16 @@ class UniversalWindow(QWidget):
 
     def closeEvent(self, event):
         self.hide()
+        FileManager().saveSubjects()
         DataManager().endSession()
         Debugger().endSession()
         QApplication.quit()
 
-    def refresh(self):
+    def refresh(self, reset = False):
+        if not reset:
+            lst = CustomList(self.ui.list)
+            lst.update()
+            return
         scrollBar = self.ui.list.verticalScrollBar()
         scrollRange = scrollBar.maximum()
         scrollValue = scrollBar.sliderPosition()
@@ -106,17 +111,20 @@ class UniversalWindow(QWidget):
                 return
             self.mode -= 1
             self.currentPath.pop()
-            self.refresh()
+            self.refresh(reset = True)
             self.changeTabs()
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.ui.list:
+            if len(self.ui.list.selectedItems()) > 1:
+                print(self.ui.list.selectedItems())
+
             menu = QMenu('Предмет')
             icons = FileManager().getIcons()
             item = source.itemAt(event.pos())
             if item is None:
                 return
-            obj = listItem = DataManager().find(str(item.data(Qt.UserRole)))
+            obj = DataManager().find(str(item.data(Qt.UserRole)))
             if obj.locked:
                 return
             menu.addAction(icons['open'], 'Открыть')

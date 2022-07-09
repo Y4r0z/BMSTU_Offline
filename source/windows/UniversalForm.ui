@@ -489,6 +489,9 @@ QScrollBar::sub-page, QScrollBar::add-page
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
        <property name="resizeMode">
         <enum>QListView::Fixed</enum>
        </property>

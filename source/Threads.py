@@ -27,8 +27,8 @@ class InitItemThread(QThread):
     
     def run(self):
         self.item.locked = True
+        item = self.item
         if self.mode == 0:
-            item = self.item
             activities = []
             if len(item['files']) == 0:
                 activities = DataManager().getActivities(item)

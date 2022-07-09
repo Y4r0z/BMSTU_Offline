@@ -100,7 +100,6 @@ def getSubjects(session, loginResult):
 
 
 def getActivities(session, s):
-    Debugger().timer.start()
     if len(s['activities']) > 0:
         return s['activities']
     with session.get(s['href']) as coursePage:
@@ -153,5 +152,4 @@ def getActivities(session, s):
                 activities.append({'text': text, 'type': type, 'href': activityLink, 'files': files, 'parent': s['href']})
             except Exception as e:
                 Debugger().throw("getActivites(). Some acts was passed because of:\n" + str(e))
-    Debugger().timer.clk('End')
     return activities
