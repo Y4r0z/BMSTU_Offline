@@ -89,6 +89,7 @@ class FileManager():
             return False
 
     def downloadFile(self, file):
+        file.locked = True
         if not DataManager().isOnline:
             Debugger().throw('FileManager().downloadFile(). The program is not online!')
             return False
@@ -102,8 +103,10 @@ class FileManager():
             with open(fullPath, 'wb') as f:
                 f.write(DataManager().getDownloadData(file))
             file.downloadProgress = 100
+            file.locked = False
             return True
         except Exception as e:
+            file.locked = False
             Debugger().throw('Cant download file\n' + str(e))
             return False
 
@@ -130,6 +133,7 @@ class FileManager():
         return True
 
     def deleteFile(self, file):
+        file.locked = True
         if file['download'] < 100:
             return False
         path = DataManager().listToPath(file.path)
@@ -141,6 +145,7 @@ class FileManager():
             os.remove(path)
         except Exception as e:
             Debugger().throw("FM.deleteFile() can't os.remove: " + str(e))
+        file.locked = False
         return True
 
 

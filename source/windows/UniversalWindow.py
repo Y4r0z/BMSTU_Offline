@@ -11,10 +11,10 @@ from pathlib import Path
 from FileManager import FileManager
 from DataManager import DataManager
 from CustomList import CustomList
-from Threads import InitItemThread
 from windows.settingsWindow import SettingsWindow
 from Debugger import Debugger
 from Downloader import Downloader, DownloadItem
+from Remover import Remover, RemoveItem
 from ListItem import ListFile, ListStorage
 
 """
@@ -116,9 +116,6 @@ class UniversalWindow(QWidget):
 
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.ui.list:
-            if len(self.ui.list.selectedItems()) > 1:
-                print(self.ui.list.selectedItems())
-
             menu = QMenu('Предмет')
             icons = FileManager().getIcons()
             item = source.itemAt(event.pos())
@@ -127,30 +124,45 @@ class UniversalWindow(QWidget):
             obj = DataManager().find(str(item.data(Qt.UserRole)))
             if obj.locked:
                 return
-            menu.addAction(icons['open'], 'Открыть')
-            if obj.Signature == 'file':
-                if obj['download'] == 0 and DataManager().isOnline:
-                    menu.addAction(icons['download'], 'Скачать')
-                if obj['download'] == 100:
-                    menu.addAction(icons['delete'], 'Удалить')
-            else:
-                if obj['download'] < 100 and DataManager().isOnline:
+            if len(self.ui.list.selectedItems()) == 1:
+                menu.addAction(icons['open'], 'Открыть')
+                if obj.Signature == 'file':
+                    if obj['download'] == 0 and DataManager().isOnline:
+                        menu.addAction(icons['download'], 'Скачать')
+                    if obj['download'] == 100:
+                        menu.addAction(icons['delete'], 'Удалить')
+                else:
+                    if obj['download'] < 100 and DataManager().isOnline:
+                        menu.addAction(icons['download'], 'Скачать всё')
+                    if obj['download'] > 0:
+                        menu.addAction(icons['delete'], 'Удалить всё')
+            elif len(self.ui.list.selectedItems()) > 1:
+                if DataManager().isOnline:
                     menu.addAction(icons['download'], 'Скачать всё')
-                if obj['download'] > 0:
-                    menu.addAction(icons['delete'], 'Удалить всё')
+                menu.addAction(icons['delete'], 'Удалить всё')
             action = menu.exec(event.globalPos())
             if action:
                 text = action.text()
-                if text == 'Открыть':
-                    self.openClicked(item)
-                if text == 'Скачать':
-                    self.downloadAll(obj)
-                elif text == 'Удалить':
-                    self.deleteFile(obj)
-                elif text == 'Скачать всё':
-                    self.downloadAll(obj)
-                elif text == 'Удалить всё':
-                    self.deleteAll(obj)
+                if len(self.ui.list.selectedItems()) == 1:
+                    if text == 'Открыть':
+                        self.openClicked(item)
+                    if text == 'Скачать':
+                        self.downloadItem(obj)
+                    elif text == 'Удалить':
+                        self.deleteItem(obj)
+                    elif text == 'Скачать всё':
+                        self.downloadItem(obj)
+                    elif text == 'Удалить всё':
+                        self.deleteItem(obj)
+                elif len(self.ui.list.selectedItems()) > 1:
+                    items = self.ui.list.selectedItems()
+                    for i in items:
+                        find = DataManager().find(str(i.data(Qt.UserRole)))
+                        if find is None: continue
+                        if text == 'Скачать всё':
+                            self.downloadItem(find)
+                        elif text == 'Удалить всё':
+                            self.deleteItem(find)
             return True
         return super().eventFilter(source, event)
 
@@ -202,36 +214,17 @@ class UniversalWindow(QWidget):
                 self.mode = 2
         self.changeTabs()
 
-    def deleteFile(self, item):
-        if item.Signature != 'file':
-            Debugger().throw("uw.deleteFile() wrong item signature!")
-        if item['download'] == 100:
-            FileManager().deleteFile(item)
+    def deleteItem(self, file):
+        if file['download'] != 0:
+            item = RemoveItem(file)
+            self.refresh()
+            item.complete.connect(self.refresh)
+            item.update.connect(self.refresh)
+            Remover().push(item)
             self.refresh()
         else:
-            Debugger().throw('UniversalWindow().deleteFileClicked() - The file is not downlaoded!')
-            return
-    
-    def deleteAll(self, item):
-        if item['download'] == 0: return
-        if item.Signature == 'file':
-            self.deleteFile(item)
-            return
-        if DataManager().isOnline:
-            self.thread = InitItemThread(item, self.mode)
-            self.thread.complete.connect(self.deleteAllThreaded)
-            self.thread.start()
-            self.refresh()
-        files = []
-        ListFile.GetFiles(item, files)
-        for i in files:
-            self.deleteAll(i)
-    def deleteAllThreaded(self, item):
-        files = []
-        ListFile.GetFiles(item, files)
-        for i in files:
-            self.deleteAll(i)
-        self.refresh()
+            Debugger().throw('uw.deleteItem() - The file is not downlaoded!')
+            return 
         
     def tryOpenFile(self, file):
         if file is None or file['type'] in ListStorage.Types:
@@ -239,33 +232,8 @@ class UniversalWindow(QWidget):
         if file['download'] == 100:
             FileManager().openFile(file)
         else:
-            self.downloadFile(file)
+            self.downloadItem(file)
         return True
-
-    def downloadAll(self, item):
-        if not DataManager().isOnline: return
-        if item['download'] == 100: return
-        if item.Signature == 'file':
-            self.downloadFile(item)
-            return
-        if DataManager().isOnline:
-            self.thread = InitItemThread(item, self.mode)
-            self.thread.complete.connect(self.downloadAllThreaded)
-            self.thread.start()
-            self.refresh()
-            return
-        files = []
-        ListFile.GetFiles(item, files)
-        for i in files:
-            self.downloadAll(i)
-    def downloadAllThreaded(self, item):
-        files = []
-        ListFile.GetFiles(item, files)
-        for i in files:
-            self.downloadAll(i)
-        self.refresh()
-        
-
 
     def settingsButtonClicked(self):
         self.settingsWindow.show()
@@ -401,12 +369,14 @@ class UniversalWindow(QWidget):
         self.ui.saveFilterButton.setIconSize(QSize(22, 22))
         FileManager().saveSettings()
 
-    def downloadFile(self, file):
+    def downloadItem(self, file):
         if not DataManager().isOnline:
-            Debugger().throw("UniversalWindow.downloadFile. Program is not online!")
+            Debugger().throw("UniversalWindow.downloadItem. Program is not online!")
             return
         item = DownloadItem(file)
+        self.refresh()
         item.complete.connect(self.refresh)
+        item.update.connect(self.refresh)
         Downloader().push(item)  
     
 

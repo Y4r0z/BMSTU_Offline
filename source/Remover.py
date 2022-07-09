@@ -5,7 +5,7 @@ from FileManager import FileManager
 from DataManager import DataManager
 from ListItem import ListFile, ListStorage
 
-class DownloadItem(QObject):
+class RemoveItem(QObject):
     complete = Signal()
     update = Signal()
     def __init__(self, file):
@@ -14,17 +14,19 @@ class DownloadItem(QObject):
         self.file.locked = True
 
     def execute(self):
+        if self.file['download'] == 0:
+            self.complete.emit()
+            return
         if self.file.Signature == 'file':
-            FileManager().downloadFile(self.file)
-            self.file.locked = False
+            FileManager().deleteFile(self.file)
         else:
             self._initItem()
-            self.file.locked = False
             files = []
             ListFile.GetFiles(self.file, files)
             for i in files:
-                FileManager().downloadFile(i)
+                FileManager().deleteFile(i)
                 self.update.emit()
+        self.file.locked = False
         self.complete.emit()
     
     def _initItem(self):
@@ -43,8 +45,8 @@ class DownloadItem(QObject):
             DataManager().getFiles(item)
 
 
-downloaderMutex = QMutex()
-class DownloaderThread(QThread):
+RemoverMutex = QMutex()
+class RemoverThread(QThread):
     queue = []
 
     def __init__(self):
@@ -52,9 +54,9 @@ class DownloaderThread(QThread):
 
     def push(self, item):
         while True:
-            if downloaderMutex.tryLock():
+            if RemoverMutex.tryLock():
                 self.queue.append(item)
-                downloaderMutex.unlock()
+                RemoverMutex.unlock()
                 return
             QThread.msleep(20)
 
@@ -64,25 +66,24 @@ class DownloaderThread(QThread):
             QThread.msleep(150)
             if len(self.queue) == 0:
                 continue
-            if downloaderMutex.tryLock():
+            if RemoverMutex.tryLock():
                 currentTask = self.queue.pop()
-                downloaderMutex.unlock()
+                RemoverMutex.unlock()
                 currentTask.execute()
 
 
 
-class Downloader:
+class Remover:
     __instance = None
 
     thread = None
 
     def __new__(self):
         if self.__instance is None:
-            self.__instance = super(Downloader, self).__new__(self)
-            self.thread = DownloaderThread()
+            self.__instance = super(Remover, self).__new__(self)
+            self.thread = RemoverThread()
             self.thread.start()
         return self.__instance
 
     def push(self, item):
         self.thread.push(item)
-
