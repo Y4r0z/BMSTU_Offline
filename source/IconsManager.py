@@ -1,6 +1,16 @@
 from PySide6.QtGui import QIcon
 from Debugger import Debugger
 
+class FileTypeIcon:
+    fileTypes = {}
+
+    def __init__(self, iconName, typeNames):
+        self.icon = iconName
+        self.type = typeNames
+        self.fileTypes[str(iconName)] = typeNames
+
+
+
 class IconsManager:
     icons = {}
 
@@ -8,8 +18,16 @@ class IconsManager:
         if name in self.icons.keys():
             return True
         return False
+    
+    def getItemIcon(self, item):
+        types = FileTypeIcon.fileTypes
+        for i in types.keys():
+            if item.type in types[i]:
+                return self.icons[i]
+        return self.icons['unknown']
 
-    def __add(self, name, path):
+
+    def __add(self, name, path, namesList = None):
         if self.find(name):
             Debugger().throw('IconsManager.__add(obj). obj is already exists')
             return
@@ -22,6 +40,8 @@ class IconsManager:
         if icon is False:
             return
         self.icons[name] = icon
+        if namesList is not None:
+            FileTypeIcon(name, namesList)
 
 
     def get(self, name):
@@ -39,15 +59,15 @@ class IconsManager:
         self.__add('resource', 'icons/resource.png')
         self.__add('course', 'icons/course.png')
         self.__add('folder', 'icons/folder.png')
-        self.__add('pdf', 'icons/pdf.png')
-        self.__add('zip', 'icons/zip.png')
-        self.__add('doc', 'icons/doc.png')
-        self.__add('txt', 'icons/txt.png')
-        self.__add('xls', 'icons/xls.png')
-        self.__add('ppt', 'icons/ppt.png')
+        self.__add('pdf', 'icons/pdf.png', ['pdf'])
+        self.__add('zip', 'icons/zip.png', ['zip', 'rar', '7zip', '7z'])
+        self.__add('doc', 'icons/doc.png', ['doc', 'docx'])
+        self.__add('txt', 'icons/txt.png', ['txt'])
+        self.__add('xls', 'icons/xls.png', ['xls', 'xlsx'])
+        self.__add('ppt', 'icons/ppt.png', ['ppt', 'pptx', 'ppsx'])
         self.__add('unknown', 'icons/unknown.png')
-        self.__add('image', 'icons/image.png')
-        self.__add('audio', 'icons/audio.png')
+        self.__add('image', 'icons/image.png', ['jpg', 'png', 'gif', 'tiff', 'bmp', 'psd'])
+        self.__add('audio', 'icons/audio.png', ['mp3', 'ogg', 'wav', 'flac', 'aac', 'wma'])
         self.__add('bmstu', 'icons/bmstu.png')
         self.__add('saved', 'icons/saved.png')
         self.__add('unsaved', 'icons/unsaved.png')

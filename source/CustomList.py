@@ -66,24 +66,8 @@ class CustomList():
                     painter.end()
                     newIcon = QIcon(pm)
                     item = QListWidgetItem(newIcon, text)
-        elif type in ['doc', 'docx']:
-            item = QListWidgetItem(self.icons['doc'], text)
-        elif type == 'txt':
-            item = QListWidgetItem(self.icons['txt'], text)
-        elif type in ['xls', 'xlsx']:
-            item = QListWidgetItem(self.icons['xls'], text)
-        elif type in ['ppt', 'pptx', 'ppsx']:
-            item = QListWidgetItem(self.icons['ppt'], text)
-        elif type == 'pdf':
-            item = QListWidgetItem(self.icons['pdf'], text)
-        elif type in ['jpg', 'png', 'gif', 'tiff', 'bmp', 'psd']:
-            item = QListWidgetItem(self.icons['image'], text)
-        elif type in ['zip', 'rar', '7zip', '7z']:
-            item = QListWidgetItem(self.icons['zip'], text)
-        elif type in ['mp3', 'ogg', 'wav', 'flac', 'aac', 'wma']:
-            item = QListWidgetItem(self.icons['audio'], text)
         else:
-            item = QListWidgetItem(self.icons['unknown'], text)
+            item = QListWidgetItem(self.icons.getItemIcon(listItem), text)
         #Href теперь храниться в элементе списка5
         item.setData(Qt.UserRole, str(listItem.href))
         self.list.addItem(item)
