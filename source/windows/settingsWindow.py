@@ -31,19 +31,11 @@ class SettingsWindow(QWidget):
         ui_file.close()
 
     def loadWidgets(self):
-        ui = self.ui;
+        ui = self.ui
         ui.saveSubjects.clicked.connect(self.saveSubjectsClicked);
 
     def saveSubjectsClicked(self):
-        #Debug
         FileManager().saveSubjects()
-        return
-        if DataManager().isOnline:
-            self.mainWindow.initiateSubjects()
-        else:
-            Debugger().throw("SettingsWindow.saveSubjects() error. Can't save subjects in offline mode.")
-
-
 
 
     def closeEvent(self, event):

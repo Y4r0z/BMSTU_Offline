@@ -2,7 +2,7 @@
 class ListItem:
     def __init__(self, text='item_text', type='item_type', href='item_href', progress=0):
         self._text = text
-        self._type = type
+        self._type = type.lower()
         self._href = href
         self._downloadProgress = progress
         self.parent = None
@@ -200,5 +200,3 @@ class ListStorage(ListItem):
         dict['download'] = self._downloadProgress
         dict['storage'] = [i.toDict() for i in self.storage]
         return dict
-
-        

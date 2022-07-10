@@ -367,6 +367,7 @@ class UniversalWindow(QWidget):
         icon = FileManager().getIcons()['unsaved']
         self.ui.saveFilterButton.setIcon(icon)
         self.ui.saveFilterButton.setIconSize(QSize(22, 22))
+        self.isFilterSaved = True
         FileManager().saveSettings()
 
     def downloadItem(self, file):

@@ -10,6 +10,7 @@ class DataManager():
         if cls.__instance is None:
             cls.__instance = super(DataManager, cls).__new__(cls)
             cls.session = requests.Session()
+            cls.sesskey = None
             cls.subjects = []
             cls.bufferSubjects = []
             cls.username = None
@@ -24,7 +25,6 @@ class DataManager():
 
             cls.loginResult = None
             cls.isOnline = False
-            cls.dataInitiated = False
         return cls.__instance
 
 
@@ -98,17 +98,6 @@ class DataManager():
             return
         endSession(self.session)
 
-    def initiateData(self):
-        subs = self.getSubjects()
-        for i in subs:
-            acts = self.getActivities(i)
-            for j in acts:
-                if j['files'] is None:
-                    continue
-                if len(j['files']) == 0 and j['type'] == 'assign':
-                    j.set( self.getFiles(j))
-        self.dataInitiated = True
-
     def setSubjects(self, data):
         if len(self.subjects) == 0:
             if self.isOnline:
@@ -125,12 +114,9 @@ class DataManager():
             self.username = l
             self.password = p
 
-    def reloadOnline(self):
-        self.subjects = []
-        self.initiateData()
-
     def login(self, username, password):
         response = loginOnline(username, password, self.session)
+        self.sesskey = getSessKey(self.session)
         self.loginResult = response
         if response.status_code == 200:
             return True

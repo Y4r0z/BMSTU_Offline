@@ -36,41 +36,47 @@ def endSession(session):
             href = exit[0].values()[0]
             session.get(href)
 
+def getSessKey(session):
+    mainPage = session.get('https://e-learning.bmstu.ru/kaluga/')
+    tree = lxml.html.fromstring(mainPage.text)
+    key = tree.xpath('//*[@id="action-menu-1-menu"]/a[5]')[0].get('href').split('=')[-1]
+    return key
 
 def getFiles(session, assign):
     try:
         with session.get(assign['href']) as page:
-            if page.status_code == 200:
-                filesList = []
-                tree = lxml.html.fromstring(page.text)
-                if assign['type'] != 'folder':
-                    files = tree.xpath("//div[@class='fileuploadsubmission']")
-                    if len(files) == 0:
-                        return None
-                    for i in files:
-                        name, type = os.path.splitext(i.xpath('img')[0].get('title'))
-                        type = type[1::]
-                        href = i.xpath('a')[0].values()[1]
-                        filesList.append({'text':name, 'href':href, 'type':type,
-                        'state':{}, 'parent':assign['href']
-                        })
-                else:
-                    files = tree.xpath("//span[@class='fp-filename-icon']")
-                    if len(files) == 0:
-                        return None
-                    for i in files:
-                        href = i.xpath('a')[0].get('href')
-                        name, type = href.split('/')[-1].split('?')[0].split('.')
-                        name = urllib.parse.unquote(name)
-                        filesList.append({'text':name, 'href':href, 'type':type,
-                        'state':{}, 'parent':assign['href']
-                        })
-                return filesList
-            else:
-                Debugger().throw('getFiles() response error')
+            if page.status_code != 200:
+                Debugger().throw('NF.getFiles() response error')
                 return []
+            filesList = []
+            tree = lxml.html.fromstring(page.text)
+            if assign['type'] != 'folder':
+                files = tree.xpath("//div[@class='fileuploadsubmission']")
+                if len(files) == 0:
+                    return None
+                for i in files:
+                    name, type = os.path.splitext(i.xpath('img')[0].get('title'))
+                    type = type[1::]
+                    href = i.xpath('a')[0].values()[1]
+                    filesList.append({'text':name, 'href':href, 'type':type,
+                    'state':{}, 'parent':assign['href']
+                    })
+            else:
+                files = tree.xpath("//span[@class='fp-filename-icon']")
+                if len(files) == 0:
+                    return None
+                for i in files:
+                    href = i.xpath('a')[0].get('href')
+                    splitted = href.split('/')[-1].split('?')[0].split('.')
+                    name = ''.join(splitted[:-1])
+                    type = splitted[-1]
+                    name = urllib.parse.unquote(name)
+                    filesList.append({'text':name, 'href':href, 'type':type,
+                    'state':{}, 'parent':assign['href']
+                    })
+            return filesList
     except Exception as e:
-        Debugger().throw('getFiles() error:\n' + str(e))
+        Debugger().throw('NF.getFiles() error:\n' + str(e))
 
 
 def getSubjects(session, loginResult):

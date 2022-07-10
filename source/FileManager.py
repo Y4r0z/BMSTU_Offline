@@ -32,7 +32,6 @@ class FileManager():
 
 
     def saveSubjects(self):
-        #DataManager().initiateData()
         jsonString = json.dumps([i.toDict() for i in self.mergeSubjects()], ensure_ascii=False)
         with open('data/subjects.json', 'w', encoding = 'utf-8') as file:
             file.write(jsonString)
