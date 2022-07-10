@@ -27,7 +27,11 @@ class FileManager():
         previous = DataManager().bufferSubjects
         if len(current) != len(previous):
             return current
-        merged = [ListFile.Merge(current[i], previous[i]) for i in range(len(current))]
+        try:
+            merged = [ListFile.Merge(current[i], previous[i]) for i in range(len(current))]
+        except Exception as e:
+            Debugger().throw("FM.mergeSubjects() error: " + str(e))
+            return previous
         return merged
 
 

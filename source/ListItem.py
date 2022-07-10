@@ -121,6 +121,8 @@ class ListItem:
                 return secondary
             elif len(secondary.storage) == 0:
                 return primary
+            elif len(primary.storage) != len(secondary.storage):
+                return primary
             else:
                 store = [ListItem.Merge(primary.storage[i], secondary.storage[i]) for i in range(len(primary.storage))]
                 primary.set(store)

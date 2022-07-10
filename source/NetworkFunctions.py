@@ -145,6 +145,11 @@ def getActivities(session, s):
                             type = tempHref.split('/')[-1].split('.')[-1]
                             activityLink = tempHref
                             text += ' аудио'
+                        elif type in ['jpg', 'png', 'gif', 'tiff', 'bmp', 'psd', 'jpeg']:
+                            t = tree2.xpath('//*[@id="region-main"]/div/div/div/div/img')[0]
+                            text = t.get('title')
+                            activityLink = t.get('src')
+                            type = activityLink.split('.')[-1]
                         else:
                             t = tree2.xpath('//*[@id="region-main"]/div/a')
                             if len(t) == 0:
@@ -152,6 +157,7 @@ def getActivities(session, s):
                                 continue
                             tempHref = t[0].get('href')
                             type = tempHref.split('.')[-1].split('?')[0]
+
                 files = None
                 if type in ['assign', 'folder']:
                     files = []
