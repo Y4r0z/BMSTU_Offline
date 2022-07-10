@@ -20,6 +20,9 @@ class IconsManager:
         return False
     
     def getItemIcon(self, item):
+        if item.type in self.icons.keys():
+            return self.icons[item.type]
+            return
         types = FileTypeIcon.fileTypes
         for i in types.keys():
             if item.type in types[i]:

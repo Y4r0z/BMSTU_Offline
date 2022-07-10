@@ -32,40 +32,6 @@ class CustomList():
         text = listItem.text
         if type is None:
             item = QListWidgetItem(text)
-        elif type == 'assign':
-            item = QListWidgetItem(self.icons['assign'], text)
-        elif type == 'resource':
-            item = QListWidgetItem(self.icons['resource'], text)
-        elif type == 'folder':
-            item = QListWidgetItem(self.icons['folder'], text)
-        elif type == 'course':
-            if len(state.keys()) == 0 or state['courseState'] is None:
-                item = QListWidgetItem(self.icons['course'], text)
-            else:
-                value = state['courseState']
-                if value == 0:
-                    item = QListWidgetItem(self.icons['courseUnsaved'], text)
-                elif value == 100:
-                    item = QListWidgetItem(self.icons['courseSaved'], text)
-                else:
-                    icon = self.icons['courseSaved']
-                    icon2 = self.icons['courseUnsaved']
-                    size = 18
-                    pm = QPixmap(size,size)
-                    pm.fill(Qt.transparent)
-                    p1 = icon.pixmap(icon.actualSize(QSize(32,32)))
-                    p1 = p1.scaled(QSize(size, size), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    p2 = icon2.pixmap(icon2.actualSize(QSize(32,32)))
-                    p2 = p2.scaled(QSize(size, size), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                    fill = value/100
-                    r1 = QRect(0,0,size,size)
-                    r2 = QRect(0,0,size,size * (1 - fill))
-                    painter = QPainter(pm)
-                    painter.drawPixmap(r1, p1, r1)
-                    painter.drawPixmap(r2, p2, r2)
-                    painter.end()
-                    newIcon = QIcon(pm)
-                    item = QListWidgetItem(newIcon, text)
         else:
             item = QListWidgetItem(self.icons.getItemIcon(listItem), text)
         #Href теперь храниться в элементе списка5
