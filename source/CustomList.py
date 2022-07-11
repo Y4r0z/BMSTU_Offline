@@ -40,6 +40,7 @@ class CustomList():
         self.setWidget(item, listItem)
     
     def setWidget(self, item, listItem):
+        #item.setSizeHint(QSize(20,20))
         widget = QWidget(self.list)
         layout = QHBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
