@@ -74,12 +74,8 @@ class IconsManager:
         self.__add('bmstu', 'icons/bmstu.png')
         self.__add('saved', 'icons/saved.png')
         self.__add('unsaved', 'icons/unsaved.png')
-        self.__add('semisaved', 'icons/semiSaved.png')
         self.__add('return', 'icons/return.png')
         self.__add('settings', 'icons/settings.png')
-        self.__add('courseSaved', 'icons/courseSaved')
-        self.__add('courseSemiSaved', 'icons/courseSemiSaved.png')
-        self.__add('courseUnsaved', 'icons/courseUnsaved.png')
         self.__add('bmstu_small', 'icons/BMSTU_cut.png')
         self.__add('lock', 'icons/lock.png')
 

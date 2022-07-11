@@ -237,6 +237,8 @@ class UniversalWindow(QWidget):
 
     def settingsButtonClicked(self):
         self.settingsWindow.show()
+        self.settingsWindow.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        self.settingsWindow.activateWindow()
 
     def generateSubjects(self, filter = None):
         size = self.ui.list.count()

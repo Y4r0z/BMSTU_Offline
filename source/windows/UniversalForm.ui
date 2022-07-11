@@ -170,12 +170,12 @@
 }
 	QPushButton:hover
 	{
-		padding: 5 5 5 5;
+		padding: 6 6 6 6;
 	}
 	QPushButton:pressed
 	{
 		background-color: rgba(0,0,0, 40);
-		padding: 3 3 3 3;	
+		padding: 4 4 4 4;	
 	}</string>
         </property>
         <property name="text">
