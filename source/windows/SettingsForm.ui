@@ -129,7 +129,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
      <property name="spacing">
       <number>16</number>
      </property>
@@ -172,46 +172,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Сохранить курсы для автономного режима</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="autoOnline">
-       <property name="font">
-        <font>
-         <family>Roboto</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Автоматический вход в сеть</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="autoOffline">
-       <property name="font">
-        <font>
-         <family>Roboto</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Автоматических вход в автономном режиме</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="autoFilter">
-       <property name="font">
-        <font>
-         <family>Roboto</family>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Автоматически сохранять фильтр</string>
+        <string>Сохранить</string>
        </property>
       </widget>
      </item>

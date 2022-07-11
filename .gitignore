@@ -9,8 +9,10 @@ data/
 
 build/
 
-тест.txt
+.vscode/
 
-Test.qml
+*.pyproject
 
-TestForm.ui.qml
+*.user
+
+.qt_for_python/uic/

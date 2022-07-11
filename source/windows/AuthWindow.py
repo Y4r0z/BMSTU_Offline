@@ -9,7 +9,7 @@ from PySide6.QtGui import QIcon
 from FileManager import FileManager
 from DataManager import DataManager
 from Threads import LoginThread
-from SplashScreen import SplashScreen
+from windows.SplashScreen import SplashScreen
 
 class AuthWindow(QMainWindow):
 
@@ -52,7 +52,6 @@ class AuthWindow(QMainWindow):
     def authOffline(self):
         if FileManager().loadSubjects():
             FileManager().loadSettings()
-            FileManager().loadDownloads()
             DataManager().isOnline = False
             self.mainWindow.loadWidgets()
             self.mainWindow.show()
@@ -87,7 +86,7 @@ class AuthWindow(QMainWindow):
     def authOnlineSuccess(self):
         DataManager().isOnline = True
         FileManager().loadSettings()
-        FileManager().loadDownloads()
+        FileManager().loadSubjects()
         if self.ui.rememberMe.isChecked():
             login = self.ui.loginEdit.text()
             password = self.ui.passwordEdit.text()
