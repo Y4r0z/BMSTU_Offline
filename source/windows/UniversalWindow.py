@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
-from PySide6.QtCore import Qt, QFile, qDebug, QEvent, QSize
+from PySide6.QtCore import Qt, QFile, qDebug, QEvent, QSize, Signal
 
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QIcon, QPalette, QColor
@@ -24,6 +24,7 @@ Modes:
 2 - Files
 """
 class UniversalWindow(QWidget):
+    exitAccount = Signal()
     def __init__(self):
         super(UniversalWindow, self).__init__()
         self.ui = None

@@ -66,6 +66,7 @@ class DataManager():
                     find = ListFile.FindByHref(activity.href, i)
                     if find is not None:
                         activity.downloadProgress = find.downloadProgress
+                        activity.description = find.description
                 activities.append(activity)
             if len(subject.storage) == 0:
                 subject.set(activities)

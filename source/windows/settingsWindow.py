@@ -32,7 +32,8 @@ class SettingsWindow(QWidget):
 
     def loadWidgets(self):
         ui = self.ui
-        ui.saveSubjects.clicked.connect(self.saveSubjectsClicked);
+        ui.saveSubjects.clicked.connect(self.saveSubjectsClicked)
+        ui.exitAccountButton.clicked.connect(self.mainWindow.exitAccount)
 
     def saveSubjectsClicked(self):
         FileManager().saveSubjects()

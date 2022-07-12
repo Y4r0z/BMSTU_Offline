@@ -129,7 +129,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
      <property name="spacing">
       <number>16</number>
      </property>
@@ -173,6 +173,31 @@
        </property>
        <property name="text">
         <string>Сохранить</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="exitAccountButton">
+       <property name="minimumSize">
+        <size>
+         <width>220</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Roboto</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Выйти из аккаунта</string>
        </property>
       </widget>
      </item>

@@ -8,6 +8,17 @@ from Debugger import Debugger
 from DataManager import DataManager
 from FileManager import FileManager
 
+def Auth():
+    global authWindow
+    authWindow = AuthWindow()
+    authWindow.complete.connect(loadProgram)
+
+def Exit():
+    global mainWindow
+    mainWindow.hide()
+    mainWindow.settingsWindow.hide()
+    Auth()
+
 
 def loadProgram(isOnline):
     global mainWindow
@@ -22,12 +33,12 @@ def loadProgram(isOnline):
         if authWindow.ui.rememberMe.isChecked():
             FileManager().saveUser(authWindow.ui.loginEdit.text(), DataManager().password)
     mainWindow = UniversalWindow()
+    mainWindow.exitAccount.connect(Exit)
     mainWindow.loadWidgets()
     mainWindow.show()
 
+
 if __name__ == "__main__":
-    global authWindow
     app = QApplication([])
-    authWindow = AuthWindow()
-    authWindow.complete.connect(loadProgram)
+    Auth()
     sys.exit(app.exec())
