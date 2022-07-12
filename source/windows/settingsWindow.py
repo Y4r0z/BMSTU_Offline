@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import *
-from PySide6.QtCore import QFile, qDebug, QEvent, QSize
+from PySide6.QtCore import QFile, qDebug, QEvent, QSize, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QIcon, QPalette, QColor
 
@@ -62,7 +62,6 @@ class SettingsWindow(QWidget):
             itype = 'assign'
         elif itype == 'Файл':
             itype = 'file'
-
         subjects = DataManager().getSubjects()
         findedList = []
         for i in subjects:
@@ -85,26 +84,21 @@ class SettingsWindow(QWidget):
         self.mainWindow.currentPath.clear()
         self.mainWindow.refresh(True)
         self.mainWindow.changeTabs()
-        cList = CustomList(self.mainWindow.ui.list)
+        oList = self.mainWindow.ui.list
+        cList = CustomList(oList)
         cList.clear()
         for i in filteredList:
+            cList.addItem(i, lowPerfomance = len(filteredList) > 24)
+        Debugger().throw("Count: " + str(oList.count()))
+        for i in range(oList.count()):
+            item = oList.item(i)
+            listItem = DataManager().find(str(item.data(Qt.UserRole)))
             path = []
-            if i.parent is None:
-                pass
-            elif i.parent.parent is None:
-                path = [i.parent.text.split(',')[0]]
-            else:
-                path = [i.parent.parent.text.split(',')[0], i.parent.text]
-            if len(path) == 0:
-                cList.addItem(i)
-            else:
-                path = '\\'.join(i for i in path)
-                cList.addItem(i)
-                for j in range(self.mainWindow.ui.list.count()):
-                    item = self.mainWindow.ui.list.item(j)
-                    if item.text() != i.text: continue
-                    item.setText(path + '\\' + i.text)
+            DataManager().getAllParents(listItem, path)
+            if len(path) > 0:
+                item.setText('\\'.join(path) + '\\' + listItem.text)
 
+        
                     
                 
 

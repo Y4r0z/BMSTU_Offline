@@ -27,7 +27,7 @@ class CustomList():
 
 
 
-    def addItem(self, listItem, state = {}):
+    def addItem(self, listItem, state = {}, lowPerfomance = False):
         if type(listItem) is str:
             item = QListWidgetItem(listItem)
             self.list.addItem(item)
@@ -40,7 +40,8 @@ class CustomList():
         #Href теперь храниться в элементе списка5
         item.setData(Qt.UserRole, str(listItem.href))
         self.list.addItem(item)
-        self.setWidget(item, listItem)
+        if not lowPerfomance:
+            self.setWidget(item, listItem)
     
     def setWidget(self, item, listItem):
         #item.setSizeHint(QSize(20,20))
@@ -57,7 +58,6 @@ class CustomList():
         elif listItem['download'] == 0:
             icon = self.icons['unsaved']
             pm = icon.pixmap(icon.actualSize(QSize(17, 17)))
-            
         else:
             icon = self.icons['saved']
             icon2 = self.icons['unsaved']
@@ -84,7 +84,6 @@ class CustomList():
             icon = self.icons['text']
             label3.setPixmap(icon.pixmap(icon.actualSize(QSize(17, 17))))
             layout.addWidget(label3)
-
         label.setPixmap(pm)
         layout.addWidget(label)
         widget.setLayout(layout)
