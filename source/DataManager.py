@@ -109,19 +109,18 @@ class DataManager():
 
     def setUser(self, l, p):
         if l is None or p is None:
-            Debugger().throw('DataManager().setUser(log, pas): log or pas is None')
+            Debugger().throw('DataManager().setUser(log, pas): login or passowrd is None')
         else:
             self.username = l
             self.password = p
 
     def login(self, username, password):
         response = loginOnline(username, password, self.session)
+        if response.status_code != 200: return False
         self.sesskey = getSessKey(self.session)
         self.loginResult = response
-        if response.status_code == 200:
-            return True
-        else:
-            return False
+        return True
+ 
 
     def getSettings(self):
         return self.settings

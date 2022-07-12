@@ -186,7 +186,16 @@ QLineEdit::hover
            <font>
             <family>Roboto</family>
             <pointsize>16</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+            <strikeout>false</strikeout>
            </font>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
+          </property>
+          <property name="tabletTracking">
+           <bool>false</bool>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit
@@ -214,6 +223,9 @@ QLineEdit::hover
           </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
           </property>
           <property name="placeholderText">
            <string>Пароль</string>

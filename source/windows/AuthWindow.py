@@ -10,16 +10,16 @@ from FileManager import FileManager
 from DataManager import DataManager
 from Threads import LoginThread
 from windows.SplashScreen import SplashScreen
+from Debugger import Debugger
 
 class AuthWindow(QMainWindow):
-
-    def __init__(self, window):
+    complete = Signal(bool)
+    def __init__(self):
         super(AuthWindow, self).__init__()
-        window.hide()
-        self.mainWindow = window
         self.ui = None
         self.load_ui()
         self.loadWidgets()
+        Debugger().timer.stop()
 
     def load_ui(self):
         loader = QUiLoader()
@@ -51,21 +51,16 @@ class AuthWindow(QMainWindow):
 
     def authOffline(self):
         if FileManager().loadSubjects():
-            FileManager().loadSettings()
-            DataManager().isOnline = False
-            self.mainWindow.loadWidgets()
-            self.mainWindow.show()
-            self.hide()
-
+            self.complete.emit(False)
         else:
-            QApplication.setQuitOnLastWindowClosed(False);
+            QApplication.setQuitOnLastWindowClosed(False)
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
             msg.setText('Не удалось войти в автономном режиме!')
             msg.setInformativeText('Возможно вы ни разу не входили в онлайн, чтобы сохранить данные для автономного режима.')
             msg.setWindowTitle('Автономный режим')
             msg.exec()
-            QApplication.setQuitOnLastWindowClosed(True);
+            QApplication.setQuitOnLastWindowClosed(True)
 
     def authOnline(self):
         self.hide()
@@ -80,24 +75,15 @@ class AuthWindow(QMainWindow):
         if state:
             self.authOnlineSuccess()
         else:
+            self.splash.hide()
             self.authOnlineFail()
-        self.splash.hide()
 
     def authOnlineSuccess(self):
-        DataManager().isOnline = True
-        FileManager().loadSettings()
-        FileManager().loadSubjects()
-        if self.ui.rememberMe.isChecked():
-            login = self.ui.loginEdit.text()
-            password = self.ui.passwordEdit.text()
-            FileManager().saveUser(login, password)
-        self.mainWindow.loadWidgets()
-        self.mainWindow.show()
-        #self.hide()
-
+        self.complete.emit(True)
+        
     def authOnlineFail(self):
         self.show()
-        QApplication.setQuitOnLastWindowClosed(False);
+        QApplication.setQuitOnLastWindowClosed(False)
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Warning)
         msg.setText('Не удалось войти в аккаунт!')
