@@ -16,6 +16,7 @@ def Auth():
 def Exit():
     global mainWindow
     mainWindow.hide()
+    DataManager().subjects.clear()
     mainWindow.settingsWindow.hide()
     Auth()
 

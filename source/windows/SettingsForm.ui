@@ -197,7 +197,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Выйти из аккаунта</string>
+        <string>Войти в другой аккаунт</string>
        </property>
       </widget>
      </item>
