@@ -79,6 +79,12 @@ class CustomList():
             icon = self.icons['lock']
             label2.setPixmap(icon.pixmap(icon.actualSize(QSize(17, 17))))
             layout.addWidget(label2)
+        if listItem.description is not None:
+            label3 = QLabel()
+            icon = self.icons['text']
+            label3.setPixmap(icon.pixmap(icon.actualSize(QSize(17, 17))))
+            layout.addWidget(label3)
+            
         label.setPixmap(pm)
         layout.addWidget(label)
         widget.setLayout(layout)

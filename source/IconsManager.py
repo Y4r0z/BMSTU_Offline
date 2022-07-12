@@ -78,5 +78,6 @@ class IconsManager:
         self.__add('settings', 'icons/settings.png')
         self.__add('bmstu_small', 'icons/BMSTU_cut.png')
         self.__add('lock', 'icons/lock.png')
+        self.__add('text', 'icons/text.png')
 
 
