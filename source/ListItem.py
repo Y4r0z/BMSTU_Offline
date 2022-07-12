@@ -7,6 +7,7 @@ class ListItem:
         self._downloadProgress = progress
         self.parent = None
         self._locked = False
+        self._description = None
         #В списке хранятся имена, которые ассоциируются со свойством/переменной
         self._properties =\
         {
@@ -15,7 +16,8 @@ class ListItem:
         ('href', 'link'): self._href,
         ('state', 'download', 'downloadState', 'downloadProgress'): self._downloadProgress,
         ('parent'): self.parent,
-        ('lock', 'locked'): self._locked
+        ('lock', 'locked'): self._locked,
+        ('description'): self._description
         }
 
     @property
@@ -55,6 +57,14 @@ class ListItem:
             for i in self.parent.storage:
                 k += i.downloadProgress
             self.parent.downloadProgress = (k/n)
+    
+    @property
+    def description(self):
+        return self._description
+    @description.setter
+    def description(self, new):
+        self._description = new
+        self._properties[('description')] = self._description
 
     def getProperty(self, key):
         ret = None
@@ -75,6 +85,7 @@ class ListItem:
         text = dict['text']
         type = dict['type']
         href = dict['href']
+        description = dict['description']
         download = dict['download']
         if dict['signature'] == 'file':
             item = ListFile(text, type, href)
@@ -87,6 +98,7 @@ class ListItem:
                 tmp.parent = item
                 items.append(tmp)
             item.set(items)
+        item.description = description
         item.downloadProgress = download
         return item
     
@@ -113,6 +125,10 @@ class ListItem:
     @staticmethod
     def Merge(primary, secondary):
         if primary.href != secondary.href: return primary
+        if primary.description is None and secondary.description is not None:
+            primary.description = secondary.description
+        else:
+            secondary.description = primary.description
         if primary.Signature == 'file':
             return primary
         if primary.Signature == 'storage':
@@ -152,7 +168,6 @@ class ListFile(ListItem):
     @property
     def path(self):
         return self._path
-
     @path.setter
     def path(self, new):
         self._path.clear()
@@ -169,6 +184,7 @@ class ListFile(ListItem):
         dict['href'] = self._href
         dict['download'] = self._downloadProgress
         dict['path'] = self._path
+        dict['description'] = self._description
         return dict
 
 
@@ -201,4 +217,5 @@ class ListStorage(ListItem):
         dict['href'] = self._href
         dict['download'] = self._downloadProgress
         dict['storage'] = [i.toDict() for i in self.storage]
+        dict['description'] = self._description
         return dict

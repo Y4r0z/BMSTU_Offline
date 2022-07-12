@@ -19,7 +19,6 @@ class AuthWindow(QMainWindow):
         self.ui = None
         self.load_ui()
         self.loadWidgets()
-        Debugger().timer.stop()
 
     def load_ui(self):
         loader = QUiLoader()
@@ -30,7 +29,7 @@ class AuthWindow(QMainWindow):
         self.setGeometry(self.ui.geometry())
         self.show()
         self.setWindowTitle('Авторизация BMSTU')
-        self.setWindowIcon(FileManager().getIcons()['bmstu'])
+        self.setWindowIcon(FileManager().getIcons()['bmstu_small'])
         ui_file.close()
 
     def loadWidgets(self):

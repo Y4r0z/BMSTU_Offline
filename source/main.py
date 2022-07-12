@@ -27,7 +27,6 @@ def loadProgram(isOnline):
 
 if __name__ == "__main__":
     global authWindow
-    Debugger().timer.start()
     app = QApplication([])
     authWindow = AuthWindow()
     authWindow.complete.connect(loadProgram)

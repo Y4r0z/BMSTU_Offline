@@ -51,6 +51,16 @@ def getFiles(session, assign):
             filesList = []
             tree = lxml.html.fromstring(page.text)
             if assign['type'] != 'folder':
+                description = None
+                try:
+                    task = tree.xpath('//*[@id="intro"]/div[1]')
+                    if len(task) != 0:
+                        lines = task[0].xpath('p')
+                        description = '\n'.join(i.text for i in lines if i.text is not None)
+                        assign.description = description
+                except Exception as e:
+                    Debugger().throw("GetFiles, can't get description(task):\n"+str(e))
+
                 files = tree.xpath("//div[@class='fileuploadsubmission']")
                 if len(files) == 0:
                     return None
@@ -59,7 +69,7 @@ def getFiles(session, assign):
                     type = type[1::]
                     href = i.xpath('a')[0].values()[1]
                     filesList.append({'text':name, 'href':href, 'type':type,
-                    'state':{}, 'parent':assign['href']
+                    'state':{}, 'parent':assign['href'], 'description':description
                     })
             else:
                 files = tree.xpath("//span[@class='fp-filename-icon']")
@@ -72,7 +82,7 @@ def getFiles(session, assign):
                     type = splitted[-1]
                     name = urllib.parse.unquote(name)
                     filesList.append({'text':name, 'href':href, 'type':type,
-                    'state':{}, 'parent':assign['href']
+                    'state':{}, 'parent':assign['href'], 'description':None
                     })
             return filesList
     except Exception as e:

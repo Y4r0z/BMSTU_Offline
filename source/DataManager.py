@@ -83,6 +83,7 @@ class DataManager():
         for i in rawFiles:
             file = ListFile(i['text'], i['type'], i['href'])
             file.parent = assign
+            file.description = i['description']
             file.path = self.generateFilePathList(file)
             for i in self.bufferSubjects:
                 find = ListFile.FindByHref(file.href, i)

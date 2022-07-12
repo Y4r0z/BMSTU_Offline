@@ -28,12 +28,15 @@ class CustomList():
 
 
     def addItem(self, listItem, state = {}):
-        type = listItem.type
+        if type(listItem) is str:
+            item = QListWidgetItem(listItem)
+            self.list.addItem(item)
+            return
+        itype = listItem.type
         text = listItem.text
-        if type is None:
-            item = QListWidgetItem(text)
-        else:
-            item = QListWidgetItem(self.icons.getItemIcon(listItem), text)
+        item = QListWidgetItem(self.icons.getItemIcon(listItem), text)
+        if listItem['description'] is not None and len(listItem['description']) > 3:
+            item.setToolTip(listItem['description'])
         #Href теперь храниться в элементе списка5
         item.setData(Qt.UserRole, str(listItem.href))
         self.list.addItem(item)
