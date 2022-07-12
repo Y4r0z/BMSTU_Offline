@@ -127,6 +127,8 @@ class ListItem:
         if primary.href != secondary.href: return primary
         if primary.description is None and secondary.description is not None:
             primary.description = secondary.description
+        elif primary.description is not None and secondary.description is None:
+            secondary.description = primary.description
         else:
             secondary.description = primary.description
         if primary.Signature == 'file':

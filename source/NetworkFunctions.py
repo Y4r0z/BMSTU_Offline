@@ -55,8 +55,19 @@ def getFiles(session, assign):
                 try:
                     task = tree.xpath('//*[@id="intro"]/div[1]')
                     if len(task) != 0:
+                        linesList = []
                         lines = task[0].xpath('p')
-                        description = '\n'.join(i.text for i in lines if i.text is not None)
+                        for i in lines:
+                            if i.text is None or len(i.text) < 2:
+                                temp = i.xpath('string()')
+                                linesList.append(temp)
+            
+                            else:
+                                linesList.append(i.text)
+
+                        description = '\n'.join([i for i in linesList])
+                        if len(description) < 5:
+                            description = None
                         assign.description = description
                 except Exception as e:
                     Debugger().throw("GetFiles, can't get description(task):\n"+str(e))
