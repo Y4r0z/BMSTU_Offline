@@ -1,3 +1,4 @@
+import Tools
 
 class ListItem:
     def __init__(self, text='item_text', type='item_type', href='item_href', progress=0):
@@ -112,7 +113,15 @@ class ListItem:
                 if find and find.href == href:
                     return find
         return None
+    
+    @staticmethod
+    def findByName(name, item, newList):
 
+        if Tools.stringCmp(item.text, name):
+            newList.append(item)
+        if item.Signature == 'storage':
+            for i in item.storage:
+                ListItem.findByName(name, i, newList)
     @staticmethod
     def StorageDepth(item):
         if item.Signature == 'file' or len(item.storage) == 0:

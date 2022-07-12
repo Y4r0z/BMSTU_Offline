@@ -16,7 +16,7 @@ from Debugger import Debugger
 from Downloader import Downloader, DownloadItem
 from Remover import Remover, RemoveItem
 from ListItem import ListFile, ListStorage
-
+import Tools
 """
 Modes:
 0 - Subjects
@@ -171,6 +171,7 @@ class UniversalWindow(QWidget):
         if self.mode != 0:
             return
         DataManager().getSettings()['filter'] = text
+        newList = []
         self.generateSubjects(text.lower())
         if self.isFilterSaved:
             self.isFilterSaved = False
@@ -184,6 +185,7 @@ class UniversalWindow(QWidget):
 
     def beginTabClicked(self):
         if self.mode == 0:
+            self.refresh(True)
             return
         self.currentPath = []
         self.mode = 0
@@ -205,12 +207,12 @@ class UniversalWindow(QWidget):
         listItem = DataManager().find(str(item.data(Qt.UserRole)))
         if listItem.locked:
             return
-        if self.mode != 0 and self.tryOpenFile(listItem):
+        if self.tryOpenFile(listItem):
             return
-        if self.mode == 0:
+        if listItem.parent is None:
             if self.generateActivities(listItem):
                 self.mode = 1
-        elif self.mode == 1:
+        elif listItem.parent.parent is None:
             if self.generateFiles(listItem):
                 self.mode = 2
         self.changeTabs()
@@ -252,22 +254,9 @@ class UniversalWindow(QWidget):
             for i in subjects:
                 cList.addItem(i)
         else:
-            CyrillicTranslateAlphabet = dict(zip(list("qwertyuiop[]asdfghjkl;'zxcvbnm,."), list('йцукенгшщзхъфывапролджэячсмитьбю')))
-            find = False
             for i in subjects:
-                if i['text'].lower().find(filter) != -1:
-                    find = True
+                if Tools.stringCmp(i.text, filter):
                     cList.addItem(i)
-            if not find:
-                text = []
-                for i in filter:
-                    if i in CyrillicTranslateAlphabet.keys():
-                        text.append(CyrillicTranslateAlphabet[i])
-                    else:
-                        text.append(i)
-                for i in subjects:
-                    if i['text'].lower().find(''.join(text)) != -1:
-                        cList.addItem(i)
         if self.ui.list.count() > 0:
             if size == self.ui.list.count():
                 self.ui.list.setCurrentRow(row)
@@ -312,7 +301,7 @@ class UniversalWindow(QWidget):
                 Debugger().throw('UniversalWindow().generateFiles() error:\n' + str(e))
                 continue
         self.ui.label.setText(listItem.text)
-        self.currentPath = [self.currentPath[0], listItem.text]
+        self.currentPath = [listItem.parent.text, listItem.text]
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)
         return True
@@ -348,8 +337,10 @@ class UniversalWindow(QWidget):
             'QPushButton{' + inactive + 'QPushButton::hover{' + active)
             begin.setStyleSheet(self.styles['beginTab'] + \
             'QPushButton{' + inactive2 + 'QPushButton::hover{' + active)
+            course.setText(self.currentPath[0])
             assign.setText(self.currentPath[1])
             assign.resize(20 + len(assign.text()) * 8, assign.height())
+            self.setTabWidth()
             self.ui.filterEdit.setEnabled(False)
             self.ui.saveFilterButton.setEnabled(False)
             assign.show()
