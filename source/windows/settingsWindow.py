@@ -88,16 +88,30 @@ class SettingsWindow(QWidget):
         oList = self.mainWindow.ui.list
         cList = CustomList(oList)
         cList.clear()
+        lastCourse = 'None'
+        lastAssign = 'None'
         for i in filteredList:
-            cList.addItem(i, lowPerfomance = len(filteredList) > 2)
+            cList.addItem(i, lowPerfomance = True)
         for i in range(oList.count()):
             item = oList.item(i)
             listItem = DataManager().find(str(item.data(Qt.UserRole)))
             path = []
             DataManager().getAllParents(listItem, path)
-            if len(path) > 0:
-                item.setText('\\'.join(path) + '\\' + listItem.text)
-
+            if self.ui.addSpacesCheck.checkState():
+                path.append(listItem.text)
+                if lastCourse not in path:
+                    lastCourse = path[0]
+                if lastAssign not in path[0] and len(path) > 1:
+                    lastAssign = path[1]
+                path.pop(-1)
+                if lastCourse in path:
+                    path[0] = '  '
+                if lastAssign in path:
+                    path[1] = '      '
+            else:
+                for i in range(len(path)):
+                    path[i] = path[i] + '\\'
+            item.setText(''.join(path) + listItem.text)
         items = []
         listItems = []     
         for i in range(oList.count()):
@@ -108,11 +122,6 @@ class SettingsWindow(QWidget):
         self.thread = Threads.setWigets(items, listItems, CustomList(oList))
         self.thread.run()
 
-        
-                    
-                
-
-        
 
     def saveSubjectsClicked(self):
         FileManager().saveSubjects()

@@ -50,7 +50,6 @@ class setWigets(QThread):
     complete = Signal()
     def __init__(self, items, listItems, lst):
         super().__init__()
-        Debugger().timer.start()
         self.items = items
         self.listItems = listItems
         self.list = lst
@@ -59,7 +58,6 @@ class setWigets(QThread):
         for i, j in zip(self.items, self.listItems):
             self.list.setWidget(i, j)
         self.complete.emit()
-        Debugger().timer.clk("Thread ww")
 
 
 
