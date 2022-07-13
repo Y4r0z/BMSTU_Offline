@@ -27,7 +27,6 @@ class AuthWindow(QMainWindow):
         ui_file.open(QFile.ReadOnly)
         self.ui = loader.load(ui_file, self)
         self.setGeometry(self.ui.geometry())
-        self.show()
         self.setWindowTitle('Авторизация BMSTU')
         self.setWindowIcon(FileManager().getIcons()['bmstu_small'])
         ui_file.close()
@@ -42,8 +41,8 @@ class AuthWindow(QMainWindow):
         self.ui.Fields.setAlignment(Qt.AlignCenter)
         self.ui.Buttons.setAlignment(Qt.AlignCenter)
         self.ui.Label.setAlignment(Qt.AlignCenter)
-
         self.splash = SplashScreen(self)
+        self.show()
 
     def closeEvent(self, event):
         DataManager().endSession()
