@@ -11,6 +11,7 @@ from DataManager import DataManager
 from Debugger import Debugger
 from ListItem import ListFile
 from CustomList import CustomList
+import Threads
 
 class SettingsWindow(QWidget):
     def __init__(self, mainwindow):
@@ -88,8 +89,7 @@ class SettingsWindow(QWidget):
         cList = CustomList(oList)
         cList.clear()
         for i in filteredList:
-            cList.addItem(i, lowPerfomance = len(filteredList) > 24)
-        Debugger().throw("Count: " + str(oList.count()))
+            cList.addItem(i, lowPerfomance = len(filteredList) > 2)
         for i in range(oList.count()):
             item = oList.item(i)
             listItem = DataManager().find(str(item.data(Qt.UserRole)))
@@ -97,6 +97,16 @@ class SettingsWindow(QWidget):
             DataManager().getAllParents(listItem, path)
             if len(path) > 0:
                 item.setText('\\'.join(path) + '\\' + listItem.text)
+
+        items = []
+        listItems = []     
+        for i in range(oList.count()):
+            item = oList.item(i)
+            listItem = DataManager().find(str(item.data(Qt.UserRole)))
+            items.append(item)
+            listItems.append(listItem)
+        self.thread = Threads.setWigets(items, listItems, CustomList(oList))
+        self.thread.run()
 
         
                     
