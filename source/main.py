@@ -1,9 +1,9 @@
 import os
 from pathlib import Path
 import sys
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import *
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QGuiApplication
 from windows.AuthWindow import AuthWindow
 from windows.UniversalWindow import UniversalWindow
 from Debugger import Debugger
@@ -40,12 +40,20 @@ def loadProgram(isOnline):
     mainWindow.loadWidgets()
     mainWindow.show()
 
+def createSplash():
+    global splash
+    geometry = QGuiApplication.primaryScreen().geometry()
+    w, h, = geometry.width(), geometry.height()
+    pix = QPixmap('icons/loadingScreen.png')
+    w2, h2 = pix.size().width(), pix.size().height()
+    k = (w2 * h2) / (w * h) * 1.33
+    splash = QSplashScreen(pix.scaled(k * w2, k * h2))
+    splash.show()
 
 
 if __name__ == "__main__":
     app = QApplication([])
-    splash = QSplashScreen(QPixmap('icons/loadingScreen.png'))
-    splash.show()
+    createSplash()
     Auth()
     splash.hide()
     sys.exit(app.exec())
