@@ -253,7 +253,7 @@ class UniversalWindow(QWidget):
         
         toAdd = []
         for i in subjects:
-            if filter is None or Tools.stringCmp(i.text, filter):
+            if filter is None or Tools.stringFind(i.text, filter):
                 toAdd.append(i) 
         cList.addItems(toAdd)
 

@@ -117,7 +117,7 @@ class ListItem:
     @staticmethod
     def findByName(name, item, newList):
 
-        if Tools.stringCmp(item.text, name):
+        if Tools.stringFind(item.text, name):
             newList.append(item)
         if item.Signature == 'storage':
             for i in item.storage:
