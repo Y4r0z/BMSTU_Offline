@@ -17,6 +17,7 @@ from Downloader import Downloader, DownloadItem
 from Remover import Remover, RemoveItem
 from ListItem import ListFile, ListStorage
 import Tools
+import Threads
 """
 Modes:
 0 - Subjects
@@ -249,14 +250,13 @@ class UniversalWindow(QWidget):
         cList = CustomList(self.ui.list)
         cList.clear()
         subjects = DataManager().getSubjects()
-        self.ui.label.setText('Мои курсы')
-        if filter is None:        
-            for i in subjects:
-                cList.addItem(i)
-        else:
-            for i in subjects:
-                if Tools.stringCmp(i.text, filter):
-                    cList.addItem(i)
+        
+        toAdd = []
+        for i in subjects:
+            if filter is None or Tools.stringCmp(i.text, filter):
+                toAdd.append(i) 
+        cList.addItems(toAdd)
+
         if self.ui.list.count() > 0:
             if size == self.ui.list.count():
                 self.ui.list.setCurrentRow(row)

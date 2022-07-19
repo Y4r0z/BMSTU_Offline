@@ -3,7 +3,7 @@ from PySide6.QtGui import QIcon, QPainter, QPixmap
 from PySide6.QtCore import QSize, Qt, QRect
 from FileManager import FileManager
 from DataManager import DataManager
-
+import Threads
 
 class CustomList():
     def __init__(self, ui_list):
@@ -26,6 +26,14 @@ class CustomList():
             self.setWidget(item, find)
 
 
+    def addItems(self, itemsList):
+        for i in itemsList:
+            self.addItem(i, lowPerfomance = True)
+        localItems = []
+        for i in range(self.list.count()):
+            localItems.append(self.list.item(i))
+        self.thread = Threads.setWigets(localItems, itemsList, self)
+        self.thread.run()
 
     def addItem(self, listItem, state = {}, lowPerfomance = False):
         if type(listItem) is str:
