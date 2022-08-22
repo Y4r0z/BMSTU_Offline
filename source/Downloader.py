@@ -15,7 +15,7 @@ class DownloadItem(QObject):
 
     def execute(self):
         if self.file.Signature == 'file':
-            FileManager().downloadFile(self.file)
+            FileManager().downloadFileGradually(self.file, self.update)
             self.file.locked = False
         else:
             self._initItem()

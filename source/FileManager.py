@@ -112,6 +112,39 @@ class FileManager():
             file.locked = False
             Debugger().throw('Cant download file\n' + str(e))
             return False
+    
+    def downloadFileGradually(self, file, signal):
+        file.locked = True
+        if not DataManager().isOnline:
+            Debugger().throw('FileManager().downloadFile(). The program is not online!')
+            return False
+        rawPath = file.path
+        try:
+            dir = DataManager().listToPath(rawPath[:-1])
+            if not os.path.exists(dir):
+                os.makedirs(dir)
+            filename = rawPath[-1]
+            fullPath = f'{dir}/{filename}'
+            r = DataManager().session.get(file['href'], stream = True)
+            length = int(r.headers.get('content-length'))
+            download = 0
+            emitCounter = 0
+            with open(fullPath, 'wb') as f:
+                for data in r.iter_content(chunk_size=4096):
+                    download += len(data)
+                    file.downloadProgress = 100 * (download/length)
+                    #Вызов апдейта только 10 раз, чтобы избежать лагов
+                    if round(file.downloadProgress) / 10 > emitCounter:
+                        emitCounter += 1
+                        signal.emit()
+                    f.write(data)
+            file.downloadProgress = 100
+            file.locked = False
+            return True
+        except Exception as e:
+            file.locked = False
+            Debugger().throw('Cant download file\n' + str(e))
+            return False
 
     def openFile(self, file):
         if file['download'] < 100:
