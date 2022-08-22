@@ -129,7 +129,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,1,3,1,1,1,0" columnstretch="100,100,1">
+    <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,0,0,0,0,0,0,0,0,0,0" columnstretch="100,0,0">
      <property name="leftMargin">
       <number>12</number>
      </property>
@@ -142,7 +142,7 @@
      <property name="bottomMargin">
       <number>30</number>
      </property>
-     <item row="3" column="1">
+     <item row="7" column="1">
       <widget class="QComboBox" name="typeComboBox">
        <property name="minimumSize">
         <size>
@@ -173,64 +173,20 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="3" column="2">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="QPushButton" name="saveSubjects">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>340</width>
-         <height>36</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>500</width>
-         <height>16777215</height>
-        </size>
-       </property>
+     <item row="8" column="0">
+      <widget class="QCheckBox" name="addSpacesCheck">
        <property name="font">
         <font>
          <family>Roboto</family>
-         <pointsize>12</pointsize>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Сохранить</string>
+        <string>Добавить отступы</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="10" column="0">
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -243,7 +199,33 @@
        </property>
       </spacer>
      </item>
-     <item row="3" column="0">
+     <item row="6" column="0">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="7" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="7" column="0">
       <widget class="QLineEdit" name="findEdit">
        <property name="minimumSize">
         <size>
@@ -277,7 +259,38 @@ QLineEdit::hover
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="0" column="0" colspan="2">
+      <widget class="QPushButton" name="saveSubjects">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>340</width>
+         <height>36</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>64</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Roboto</family>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Сохранить</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
       <widget class="QPushButton" name="findButton">
        <property name="minimumSize">
         <size>
@@ -328,17 +341,40 @@ QLineEdit::hover
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QCheckBox" name="addSpacesCheck">
-       <property name="font">
-        <font>
-         <family>Roboto</family>
-         <pointsize>10</pointsize>
-        </font>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string>Добавить отступы</string>
+       <item>
+        <widget class="QCheckBox" name="slowModeCheck">
+         <property name="font">
+          <font>
+           <family>Roboto</family>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Подгрузка списка будет более плавной</string>
+         </property>
+         <property name="text">
+          <string>Режим медленного интернета</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="2" column="0">
+      <spacer name="verticalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
-      </widget>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

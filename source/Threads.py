@@ -5,6 +5,8 @@ from PySide6.QtCore import QThread, Signal, QMutex
 from ListItem import ListFile, ListStorage, ListItem
 from CustomList import CustomList
 from Debugger import Debugger
+from NetworkFunctions import iterActivities
+from CustomList import CustomList
 
 class LoginThread(QThread):
     complete = Signal(bool)
@@ -57,6 +59,25 @@ class setWigets(QThread):
     def run(self):
         for i, j in zip(self.items, self.listItems):
             self.list.setWidget(i, j)
+        self.complete.emit()
+
+class generateActivitiesThreaded(QThread):
+    complete = Signal()
+    update = Signal()
+    def __init__(self, _list : CustomList, subject):
+        super().__init__()
+        self.list = _list
+        self.subject = subject
+    
+    def run(self):
+        activities = []
+        for i in DataManager().iterActivities(self.subject):
+            activities.append(i)
+            try:
+                self.list.addItem(i, lowPerfomance = True)
+            except Exception as e:
+                Debugger().throw("Can't add iterActivity: " + str(e))
+            self.update.emit()
         self.complete.emit()
 
 

@@ -125,8 +125,35 @@ def getSubjects(session, loginResult):
         Debugger().throw('Main page response error!')
     return subjects
 
+def iterActivities(session, subject):
+    """
+    Итератор для getActivities().
+    """
+    with session.get(subject['href']) as coursePage:
+        if coursePage.status_code != 200:
+            Debugger().throw('Course page response error!')
+            return None
+        tree = lxml.html.fromstring(coursePage.text)
+        topics = tree.xpath('//*[@id="region-main"]/div/div/div/div/ul')
+        if len(topics) == 0:
+            return None
+        acts = topics[0].xpath('//*[starts-with(@id,"module")]')
+        for i in acts:
+            try:
+                parsedActivity = parseActivity(i, session)
+                if not parsedActivity:
+                    yield None
+                else:
+                    parsedActivity['parent'] = subject['href']
+                    yield parsedActivity
+            except Exception as e:
+                Debugger().throw("iterActivites(). Some activites was passed because of:\n" + str(e))
 
 def getActivities(session, s):
+    """
+        session - авторизированная сессия requests
+        s - subject, курс
+    """
     if len(s['activities']) > 0:
         return s['activities']
     with session.get(s['href']) as coursePage:
@@ -141,48 +168,58 @@ def getActivities(session, s):
         acts = topics[0].xpath('//*[starts-with(@id,"module")]')
         for i in acts:
             try:
-                #get type
-                type = i.get('class').split(' ')[1].lower()
-                if type not in ['assign', 'resource', 'folder']:
-                    continue
-                #get name
-                textraw = i.xpath('div/div/div[2]/div[1]/a/span/text()')
-                if len(textraw) == 0:
-                    continue
-                text = textraw[0]
-                #Get href
-                activity = i.xpath('div/div/div[2]/div[1]/a')[0]
-                activityLink = activity.get('href')
-                #get type for resource
-                if type == 'resource':
-                    source = activity.xpath('img')[0].get('src')
-                    type = source.split('/')[-1].split('-')[0]
-                    if type != 'pdf':
-                        downloadLink = session.get(activityLink, allow_redirects=False)
-                        tree2 = lxml.html.fromstring(downloadLink.text)
-                        if type == 'mp3':
-                            t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
-                            tempHref = t[0].get('src')
-                            type = tempHref.split('/')[-1].split('.')[-1]
-                            activityLink = tempHref
-                            text += ' аудио'
-                        elif type in ['jpg', 'png', 'gif', 'tiff', 'bmp', 'psd', 'jpeg']:
-                            t = tree2.xpath('//*[@id="region-main"]/div/div/div/div/img')[0]
-                            text = t.get('title')
-                            activityLink = t.get('src')
-                            type = activityLink.split('.')[-1]
-                        else:
-                            t = tree2.xpath('//*[@id="region-main"]/div/a')
-                            if len(t) == 0:
-                                Debugger().throw("Undefined activity type!")
-                                continue
-                            tempHref = t[0].get('href')
-                            type = tempHref.split('.')[-1].split('?')[0]
-
-                files = None
-                if type in ['assign', 'folder']:
-                    files = []
-                activities.append({'text': text, 'type': type, 'href': activityLink, 'files': files, 'parent': s['href']})
+                parsedActivity = parseActivity(i, session)
+                if parsedActivity:
+                    parsedActivity['parent'] = s['href']
+                    activities.append(parsedActivity)
             except Exception as e:
                 Debugger().throw("getActivites(). Some acts was passed because of:\n" + str(e))
     return activities
+
+def parseActivity(rawActivity, session):
+    """
+    На вход подается список html объектов activity
+    Формат вывода:
+    {'text': text, 'type': type, 'href': activityLink, 'files': files}
+    """
+    #get type
+    type = rawActivity.get('class').split(' ')[1].lower()
+    if type not in ['assign', 'resource', 'folder']:
+        return
+    #get name
+    textraw = rawActivity.xpath('div/div/div[2]/div[1]/a/span/text()')
+    if len(textraw) == 0:
+        return
+    text = textraw[0]
+    #Get href
+    activity = rawActivity.xpath('div/div/div[2]/div[1]/a')[0]
+    activityLink = activity.get('href')
+    #get type for resource
+    if type == 'resource':
+        source = activity.xpath('img')[0].get('src')
+        type = source.split('/')[-1].split('-')[0]
+        if type != 'pdf':
+            downloadLink = session.get(activityLink, allow_redirects=False)
+            tree2 = lxml.html.fromstring(downloadLink.text)
+            if type == 'mp3':
+                t = tree2.xpath('/html/body/div[1]/div[2]/div/div/section/div/div/div/div/div/div/div/div/audio/source')
+                tempHref = t[0].get('src')
+                type = tempHref.split('/')[-1].split('.')[-1]
+                activityLink = tempHref
+                text += ' аудио'
+            elif type in ['jpg', 'png', 'gif', 'tiff', 'bmp', 'psd', 'jpeg']:
+                t = tree2.xpath('//*[@id="region-main"]/div/div/div/div/img')[0]
+                text = t.get('title')
+                activityLink = t.get('src')
+                type = activityLink.split('.')[-1]
+            else:
+                t = tree2.xpath('//*[@id="region-main"]/div/a')
+                if len(t) == 0:
+                    Debugger().throw("Undefined activity type!")
+                    return
+                tempHref = t[0].get('href')
+                type = tempHref.split('.')[-1].split('?')[0]
+    files = None
+    if type in ['assign', 'folder']:
+        files = []
+    return {'text': text, 'type': type, 'href': activityLink, 'files': files}

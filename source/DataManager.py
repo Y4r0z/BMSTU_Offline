@@ -4,6 +4,7 @@ from NetworkFunctions import *
 import os
 import sys
 from ListItem import ListFile, ListStorage
+
 class DataManager():
     __instance = None
     def __new__(cls):
@@ -48,13 +49,46 @@ class DataManager():
             Debugger().throw("getSubjects() error:\n" + str(e))
         return self.subjects
 
+    def iterActivities(self, subject):
+        try:
+            rawActivities = iterActivities(self.session, subject)
+            if rawActivities is None:
+                Debugger().throw("iterActivities is none.")
+                return
+            activities = []
+            for i in rawActivities:
+                if i is None: continue
+                if i['type'] in ListStorage.Types:
+                    activity = ListStorage(i['text'], i['type'], i['href'])
+                    activity.parent = subject
+                else:
+                    activity = ListFile(i['text'], i['type'], i['href'])
+                    activity.parent = subject
+                    activity.path = self.generateFilePathList(activity)
+                for i in self.bufferSubjects:
+                    find = ListFile.FindByHref(activity.href, i)
+                    if find is not None:
+                        activity.downloadProgress = find.downloadProgress
+                        activity.description = find.description
+                activities.append(activity)
+                yield activity
+            if len(subject.storage) == 0:
+                subject.set(activities)
+        except Exception as e:
+            Debugger().throw("DataManager.iterActivities() error:\n" + str(e))
+        return []
+
     def getActivities(self, subject):
         if len(subject['files']) != 0:
             return subject['files']
         try:
             rawActivities = getActivities(self.session, subject)
+            if rawActivities is None:
+                Debugger().throw("iterActivities is none.")
+                return
             activities = []
             for i in rawActivities:
+                if i is None: continue
                 if i['type'] in ListStorage.Types:
                     activity = ListStorage(i['text'], i['type'], i['href'])
                     activity.parent = subject

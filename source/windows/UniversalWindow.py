@@ -34,6 +34,7 @@ class UniversalWindow(QWidget):
         self.currentPath = []
         self.styles = {}
         self.isFilterSaved = True
+        self.slowMode = False
         self.settingsWindow = SettingsWindow(self)
 
     def load_ui(self):
@@ -263,20 +264,43 @@ class UniversalWindow(QWidget):
             else:
                 self.ui.list.setCurrentRow(0)
 
+    def generateActivitiesGradually(self, listItem):
+        cList = CustomList(self.ui.list)
+        cList.clear()
+        self.ui.label.setText(listItem['text'])
+        self.currentPath = [listItem['text']]
+        self.mode = 1
+        self.activitiesThread = Threads.generateActivitiesThreaded(cList, listItem)
+        self.activitiesThread.start()
+        self.activitiesThread.update.connect(self.update)
+        self.activitiesThread.complete.connect(self.setActivityWidgets)
+    
+    def setActivityWidgets(self):
+        cList = CustomList(self.ui.list)
+        for i in range(self.ui.list.count()):
+            item = self.ui.list.item(i)
+            listItem = DataManager().find(str(item.data(Qt.UserRole)))
+            cList.setWidget(item, listItem)
+
+
+
     def generateActivities(self, listItem):
+        if self.slowMode:
+            self.generateActivitiesGradually(listItem)
+            return True
         activities = DataManager().getActivities(listItem)
         if len(activities) == 0: return False
-        list = CustomList(self.ui.list)
-        list.clear()
+        cList = CustomList(self.ui.list)
+        cList.clear()
         self.ui.label.setText(listItem['text'])
         self.currentPath = [listItem['text']]
         self.mode = 1
         for i in activities:
             try:
-                list.addItem(i)
+                cList.addItem(i)
             except Exception as e:
                 Debugger().throw("UniversalWindow.generateActivities error:\n" + str(e))
-                list.addItem('Error')
+                cList.addItem('Error')
                 continue
         if self.ui.list.count() > 0:
             self.ui.list.setCurrentRow(0)

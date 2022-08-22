@@ -38,8 +38,12 @@ class SettingsWindow(QWidget):
         ui.saveSubjects.clicked.connect(self.saveSubjectsClicked)
         ui.exitAccountButton.clicked.connect(self.mainWindow.exitAccount)
         ui.findButton.clicked.connect(self.findButtonClicked)
+        ui.slowModeCheck.stateChanged.connect(self.slowModeChanged)
         self.addItems()
     
+    def slowModeChanged(self, state):
+        self.mainWindow.slowMode = state
+        
     def addItems(self):
         box = self.ui.typeComboBox
         box.addItem('Все')

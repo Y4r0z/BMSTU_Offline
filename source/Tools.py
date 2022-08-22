@@ -7,7 +7,7 @@ def stringCmp(original, toFind):
          or original.lower().find(invertString(toFind)) != -1:
         return True
     for word in original.split(' '):
-        if fuzz.token_set_ratio(word, toFind) > 60:
+        if fuzz.token_set_ratio(word, toFind) > 60 or fuzz.token_set_ratio(word, invertString(toFind)) > 60:
             return True
     return False
 
