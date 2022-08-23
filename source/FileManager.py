@@ -130,7 +130,7 @@ class FileManager():
             download = 0
             emitCounter = 0
             with open(fullPath, 'wb') as f:
-                for data in r.iter_content(chunk_size=4096):
+                for data in r.iter_content(chunk_size=1024):
                     download += len(data)
                     file.downloadProgress = 100 * (download/length)
                     #Вызов апдейта только 10 раз, чтобы избежать лагов
