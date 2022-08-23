@@ -9,23 +9,11 @@ GetUrl = 'https://proxy.bmstu.ru:8443/cas/login?service=https://e-learning.bmstu
 
 def getCookie(session):
     cookiePath = '//*[@id="fm1"]/section[4]/input[1]'
-    #Анализ содержимого на наличие значения cookie
-    with session.get(GetUrl, stream = True) as response:
-        content = response.iter_content(chunk_size = 4096)
-        chunk = ""
-        find = '<input type="hidden" name="execution" value="'
-        for data in content:
-            string = data.decode('UTF-8')
-            if find in string:
-                chunk += string
-                chunk += next(content).decode('UTF-8')
-                break
-    cookie = ""
-    for i in range(chunk.find(find) + len(find), len(chunk)):
-        if chunk[i] == '"':
-            break
-        cookie += chunk[i]
-    return cookie
+    with session.get(GetUrl) as response:
+        tree = lxml.html.fromstring(response.text)
+        cookieElement = tree.xpath(cookiePath)[0]
+        cookieValue = cookieElement.value
+    return cookieValue
 
 
 def loginOnline(login, password, session):
