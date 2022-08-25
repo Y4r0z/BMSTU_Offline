@@ -31,8 +31,15 @@ class PropertyWindow(QWidget):
 
     def loadWidgets(self):
         self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint | Qt.WindowCloseButtonHint | Qt.WindowStaysOnTopHint)
-        pos = QCursor.pos()
-        self.move(50, 50)
+        res = QApplication.primaryScreen().geometry()
+        cursor = QCursor.pos()
+        size = self.size()
+        newPos = QPoint(cursor.x() - size.width()/2, cursor.y() - size.height()/2)
+        newPos.setX(0 if newPos.x() < 0 else newPos.x()) 
+        newPos.setY(0 if newPos.y() < 0 else newPos.y())
+        newPos.setX(res.width() - size.width() if (newPos.x() + size.width()) > res.width() else newPos.x())
+        newPos.setY(res.height() - size.height() if (newPos.y() + size.height()) > res.height() else newPos.y())
+        self.move(newPos)
 
         self.generalTab()
 
