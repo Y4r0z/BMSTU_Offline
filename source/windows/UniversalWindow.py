@@ -18,6 +18,8 @@ from Remover import Remover, RemoveItem
 from ListItem import ListFile, ListStorage
 import Tools
 import Threads
+from windows.PropertyWindow import PropertyWindow
+
 """
 Modes:
 0 - Subjects
@@ -36,6 +38,7 @@ class UniversalWindow(QWidget):
         self.isFilterSaved = True
         self.slowMode = False
         self.settingsWindow = SettingsWindow(self)
+        self.propertyWindows = []
 
     def load_ui(self):
         loader = QUiLoader()
@@ -129,6 +132,7 @@ class UniversalWindow(QWidget):
                 return
             if len(self.ui.list.selectedItems()) == 1:
                 menu.addAction(icons['open'], 'Открыть')
+                menu.addAction(icons['info'],'Свойства')
                 if obj.Signature == 'file':
                     if obj['download'] == 0 and DataManager().isOnline:
                         menu.addAction(icons['download'], 'Скачать')
@@ -157,6 +161,8 @@ class UniversalWindow(QWidget):
                         self.downloadItem(obj)
                     elif text == 'Удалить всё':
                         self.deleteItem(obj)
+                    elif text == 'Свойства':
+                        self.openProperty(obj)
                 elif len(self.ui.list.selectedItems()) > 1:
                     items = self.ui.list.selectedItems()
                     for i in items:
@@ -180,6 +186,10 @@ class UniversalWindow(QWidget):
             icon = FileManager().getIcons()['saved']
             self.ui.saveFilterButton.setIcon(icon)
             self.ui.saveFilterButton.setIconSize(QSize(22, 22))
+    
+    def openProperty(self, listItem):
+        window = PropertyWindow(listItem)
+        self.propertyWindows.append(window)
 
     def listItemDoubleClicked(self, item):
         self.openClicked(item)

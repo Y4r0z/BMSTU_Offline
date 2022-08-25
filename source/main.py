@@ -14,6 +14,9 @@ def Auth():
     global authWindow
     authWindow = AuthWindow()
     authWindow.complete.connect(loadProgram)
+    authWindow.show()
+    authWindow.setWindowState(authWindow.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+    authWindow.activateWindow()
 
 def Exit():
     global mainWindow
@@ -50,10 +53,13 @@ def createSplash():
     splash = QSplashScreen(pix.scaled(k * w2, k * h2))
     splash.show()
 
-
-if __name__ == "__main__":
+def main():
     app = QApplication([])
     createSplash()
     Auth()
     splash.hide()
     sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
