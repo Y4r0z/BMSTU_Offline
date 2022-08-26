@@ -109,6 +109,10 @@ def getSubjects(session, loginResult):
         tree = lxml.html.parse(mainPage.raw)
         for i in tree.xpath(coursesPath):
             course = i.xpath('div[1]/h3/a')
+            teachers = i.xpath("div[2]/ul/li")
+            teacherNames = ['Преподаватели:']
+            for t in teachers:
+                teacherNames.append(t.xpath('a/text()')[0])
             if len(course) > 0:
                 courseID = i.values()[1]
                 subjects.append(
@@ -116,7 +120,8 @@ def getSubjects(session, loginResult):
                 'text': course[0].text,
                 'href': course[0].values()[1],
                 'id': courseID,
-                'activities': []
+                'activities': [],
+                'description': ('\n'.join(teacherNames) if len(teacherNames) > 1 else None)
                 }
                 )
 

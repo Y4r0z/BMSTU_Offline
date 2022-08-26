@@ -71,7 +71,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="general">
       <attribute name="title">
@@ -255,6 +255,18 @@
          </item>
          <item>
           <widget class="QTextEdit" name="teachers">
+           <property name="font">
+            <font>
+             <family>Roboto</family>
+             <pointsize>9</pointsize>
+             <italic>false</italic>
+             <stylestrategy>PreferDefault</stylestrategy>
+             <kerning>true</kerning>
+            </font>
+           </property>
+           <property name="cursor" stdset="0">
+            <cursorShape>ArrowCursor</cursorShape>
+           </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
            </property>
@@ -266,6 +278,12 @@
            </property>
            <property name="readOnly">
             <bool>true</bool>
+           </property>
+           <property name="cursorWidth">
+            <number>0</number>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
          </item>

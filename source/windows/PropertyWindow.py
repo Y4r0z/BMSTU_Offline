@@ -53,6 +53,12 @@ class PropertyWindow(QWidget):
         else:
             tab = self.ui.tabWidget.indexOf(self.ui.tabWidget.findChild(QWidget, 'file'))
             self.ui.tabWidget.removeTab(tab)
+        if self.item.type == 'course':
+            self.courseTab()
+        else:
+            tab = self.ui.tabWidget.indexOf(self.ui.tabWidget.findChild(QWidget, 'course'))
+            self.ui.tabWidget.removeTab(tab)
+
 
         self.show()
         self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
@@ -82,7 +88,11 @@ class PropertyWindow(QWidget):
         path.setCursorPosition(0)
         size.setText(Tools.sizeof_fmt(os.path.getsize(DataManager().listToPath(self.item.path))))
         
-    
+    def courseTab(self):
+        ui = self.ui.tabWidget.findChild(QWidget, 'course')
+        teachers = ui.findChild(QTextEdit, 'teachers')
+        teachers.setText(self.item.description if self.item.description is not None else "Преподаватели не указаны")
+
     def openFile(self):
         FileManager().openFile(self.item)
 

@@ -39,6 +39,7 @@ class DataManager():
             subjects = []
             for i in rawSubjects:
                 subject = ListStorage(i['text'], 'course', i['href'])
+                subject.description = i['description']
                 for i in self.bufferSubjects:
                     find = ListFile.FindByHref(subject.href, i)
                     if find is not None:
