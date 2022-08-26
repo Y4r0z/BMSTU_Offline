@@ -8,6 +8,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QIcon, QMovie, QCursor
 from FileManager import FileManager
 from DataManager import DataManager
+import Tools
 
 class PropertyWindow(QWidget):
     def __init__(self, item):
@@ -42,6 +43,16 @@ class PropertyWindow(QWidget):
         self.move(newPos)
 
         self.generalTab()
+        if (self.item.type == 'assign' or self.item.Signature == 'file') and self.item.description is not None:
+            self.assignTab()
+        else:
+            tab = self.ui.tabWidget.indexOf(self.ui.tabWidget.findChild(QWidget, 'assign'))
+            self.ui.tabWidget.removeTab(tab)
+        if self.item.Signature == 'file' and len(self.item.path) > 0 and os.path.exists(DataManager().listToPath(self.item.path)):
+            self.fileTab()
+        else:
+            tab = self.ui.tabWidget.indexOf(self.ui.tabWidget.findChild(QWidget, 'file'))
+            self.ui.tabWidget.removeTab(tab)
 
         self.show()
         self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
@@ -50,10 +61,32 @@ class PropertyWindow(QWidget):
     def generalTab(self):
         ui = self.ui.tabWidget.findChild(QWidget, 'general')
         icon = ui.findChild(QLabel, 'icon')
-        icon.setPixmap(FileManager().getIcons()[self.item.type].pixmap(32,32))
+        icon.setPixmap(FileManager().getIcons().getItemIcon(self.item).pixmap(32,32))
         name = ui.findChild(QLineEdit, 'name')
         name.setText(self.item.text)
         name.setCursorPosition(0)
+    
+    def assignTab(self):
+        ui = self.ui.tabWidget.findChild(QWidget, 'assign')
+        task = ui.findChild(QTextEdit, 'task')
+        task.setText(self.item.description)
+    
+    def fileTab(self):
+        ui = self.ui.tabWidget.findChild(QWidget, 'file')
+        size = ui.findChild(QLabel, 'size')
+        path = ui.findChild(QLineEdit, 'path')
+        openButton = ui.findChild(QPushButton, 'openButton')
+        openButton.setIcon(FileManager().getIcons()['open'])
+        openButton.clicked.connect(self.openFile)
+        path.setText(os.path.abspath(DataManager().listToPath(self.item.path)))
+        path.setCursorPosition(0)
+        size.setText(Tools.sizeof_fmt(os.path.getsize(DataManager().listToPath(self.item.path))))
+        
+    
+    def openFile(self):
+        FileManager().openFile(self.item)
 
     def closeEvent(self, event):
         pass
+
+    

@@ -132,7 +132,6 @@ class UniversalWindow(QWidget):
                 return
             if len(self.ui.list.selectedItems()) == 1:
                 menu.addAction(icons['open'], 'Открыть')
-                menu.addAction(icons['info'],'Свойства')
                 if obj.Signature == 'file':
                     if obj['download'] == 0 and DataManager().isOnline:
                         menu.addAction(icons['download'], 'Скачать')
@@ -143,6 +142,7 @@ class UniversalWindow(QWidget):
                         menu.addAction(icons['download'], 'Скачать всё')
                     if obj['download'] > 0:
                         menu.addAction(icons['delete'], 'Удалить всё')
+                menu.addAction(icons['info'],'Свойства')
             elif len(self.ui.list.selectedItems()) > 1:
                 if DataManager().isOnline:
                     menu.addAction(icons['download'], 'Скачать всё')

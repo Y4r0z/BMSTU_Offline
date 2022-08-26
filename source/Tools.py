@@ -28,3 +28,10 @@ def invertString(string):
             text.append(i)
     return ''.join(text)
 
+def sizeof_fmt(num):
+    for unit in ["", "КБ", "МБ", "ГБ", "ТБ", "ПБ"]:
+        if abs(num) < 1024.0:
+            return f"{num:3.1f} {unit}"
+        num /= 1024.0
+    return f"{num:.1f}"
+
