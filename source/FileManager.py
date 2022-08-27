@@ -54,9 +54,11 @@ class FileManager():
         return self._icons
 
     def saveUser(self, login=None, password=None):
+        Debugger().throw('Save stage 1')
         if login is None or password is None:
             login = DataManager().username
             password = DataManager().password
+            Debugger().throw(login + " 2 " + password)
             if login is None or password is None:
                 return False
         Debugger().throw("Saving user.")
