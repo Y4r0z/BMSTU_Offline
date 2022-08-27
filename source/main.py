@@ -60,9 +60,6 @@ def createSplash():
     splash.show()
 
 def main():
-    if not sys.platform.startswith('win'):
-        os.path.join('platforms')
-
     app = QApplication([])
     createSplash()
     Auth()
