@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import sys
+import PySide6
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QPixmap, QGuiApplication
@@ -21,7 +22,11 @@ def Auth():
 def Exit():
     global mainWindow
     mainWindow.hide()
-    DataManager().subjects.clear()
+    Debugger().throw("Exit account.")
+    DataManager().endSession()
+    FileManager().saveSubjects()
+    DataManager.kill()
+    FileManager.kill()
     mainWindow.settingsWindow.hide()
     Auth()
 
@@ -37,7 +42,8 @@ def loadProgram(isOnline):
     if isOnline:
         FileManager().loadSubjects()
         if authWindow.ui.rememberMe.isChecked():
-            FileManager().saveUser(authWindow.ui.loginEdit.text(), DataManager().password)
+            if not FileManager().saveUser(authWindow.ui.loginEdit.text(), authWindow.ui.passwordEdit.text()):
+                Debugger().throw("FM.saveUser() failed!")
     mainWindow = UniversalWindow()
     mainWindow.exitAccount.connect(Exit)
     mainWindow.loadWidgets()

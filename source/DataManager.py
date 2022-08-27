@@ -28,6 +28,10 @@ class DataManager():
             cls.isOnline = False
         return cls.__instance
 
+    @classmethod
+    def kill(self):
+        del self.__instance
+        self.__instance = None
 
     def getSubjects(self):
         if len(self.subjects) > 0:

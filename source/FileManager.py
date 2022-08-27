@@ -22,6 +22,11 @@ class FileManager():
 
         return cls.__instance
     
+    @classmethod
+    def kill(self):
+        del self.__instance
+        self.__instance = None
+    
     def mergeSubjects(self):
         current = DataManager().getSubjects()
         previous = DataManager().bufferSubjects
@@ -59,6 +64,7 @@ class FileManager():
             password = DataManager().password
             if login is None or password is None:
                 return False
+        Debugger().throw("Saving user.")
         jsonString = json.dumps([{'login':login, 'password':password}], ensure_ascii = False)
         with open('data/user.json', 'w', encoding='utf-8') as file:
             file.write(jsonString)
