@@ -13,7 +13,8 @@ a = Analysis(
         ('source\\windows\\AuthForm.ui','windows'),
         ('source\\windows\\SettingsForm.ui','windows'),
         ('source\\windows\\SplashScreenForm.ui','windows'),
-        ('source\\windows\\UniversalForm.ui','windows')
+        ('source\\windows\\UniversalForm.ui','windows'),
+        ('source\\windows\\PropertyForm.ui','windows')
     ],
     hiddenimports=[],
     hookspath=[],

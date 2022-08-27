@@ -80,7 +80,8 @@ class UniversalWindow(QWidget):
         self.changeTabs()
 
     def closeEvent(self, event):
-        self.hide()
+        if sys.platform.startswith('win'):
+            self.hide()
         FileManager().saveSubjects()
         DataManager().endSession()
         Debugger().endSession()
