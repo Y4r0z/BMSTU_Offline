@@ -22,6 +22,11 @@ class FileManager():
 
         return cls.__instance
     
+    @classmethod
+    def kill(self):
+        del self.__instance
+        self.__instance = None
+    
     def mergeSubjects(self):
         current = DataManager().getSubjects()
         previous = DataManager().bufferSubjects

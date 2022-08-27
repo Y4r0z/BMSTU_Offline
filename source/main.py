@@ -21,7 +21,11 @@ def Auth():
 def Exit():
     global mainWindow
     mainWindow.hide()
-    DataManager().subjects.clear()
+    Debugger().throw("Exit account.")
+    DataManager().endSession()
+    FileManager().saveSubjects()
+    DataManager.kill()
+    FileManager.kill()
     mainWindow.settingsWindow.hide()
     Auth()
 
