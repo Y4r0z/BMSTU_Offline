@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import sys
+import PySide6
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtWidgets import *
 from PySide6.QtGui import QPixmap, QGuiApplication
@@ -59,6 +60,9 @@ def createSplash():
     splash.show()
 
 def main():
+    if not sys.platform.startswith('win'):
+        os.path.join('platforms')
+
     app = QApplication([])
     createSplash()
     Auth()
