@@ -37,7 +37,8 @@ def loadProgram(isOnline):
     if isOnline:
         FileManager().loadSubjects()
         if authWindow.ui.rememberMe.isChecked():
-            FileManager().saveUser(authWindow.ui.loginEdit.text(), DataManager().password)
+            if not FileManager().saveUser(authWindow.ui.loginEdit.text(), authWindow.ui.passwordEdit.text()):
+                Debugger().throw("FM.saveUser() failed!")
     mainWindow = UniversalWindow()
     mainWindow.exitAccount.connect(Exit)
     mainWindow.loadWidgets()
